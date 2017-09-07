@@ -5,11 +5,13 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Windows;
 using System.Windows.Controls;
+using SPP_CustomThreadPool;
 
 namespace SPP_Laba2
 {
 	public partial class MainWindow
 	{
+		public CustomThreadPool Pool;
 		private string _sourcePath;
 		private string _destinationPath;
 
@@ -37,7 +39,17 @@ namespace SPP_Laba2
 				TwSource.Items.Add(source);
 				TwDestination.Items.Add(destination);
 			}
-			
+
+			//Pool = CustomThreadPool.GetInstance;
+			//var task = Pool.QueueUserTask(
+			//	() =>
+			//	{
+			//		// do smth
+			//	},
+			//	ts =>
+			//	{
+			//		// callback
+			//	});
 		}
 
 		private void Item_Expanded(object sender, RoutedEventArgs e)
