@@ -5,8 +5,21 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SPP_Laba2"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        
-    </Grid>
+        Title="MainWindow" Height="504.667" Width="525">
+	<Grid>
+		<Label Content="Source folder" HorizontalAlignment="Left" Margin="10,10,10,0" VerticalAlignment="Top"/>
+		<Label Content="DestinationFolder" HorizontalAlignment="Right" Margin="10,10,10,0" VerticalAlignment="Top"/>
+		<ListBox x:Name="LbLog" HorizontalAlignment="Stretch" Margin="10,0,10,10" VerticalAlignment="Bottom" Height="180"/>
+		<Grid VerticalAlignment="Stretch" Margin="0,36,0,190">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition/>
+				<ColumnDefinition/>
+			</Grid.ColumnDefinitions>
+			<TreeView Grid.Column="0" x:Name="TwSource"  HorizontalAlignment="Stretch" Margin="10" VerticalAlignment="Stretch" SelectedItemChanged="OnSourceChanged"/>
+			<TreeView Grid.Column="1" x:Name="TwDestination" HorizontalAlignment="Stretch" Margin="10" VerticalAlignment="Stretch" SelectedItemChanged="OnDestinationChanged"/>
+		</Grid>
+		<Button Content="Copy" HorizontalAlignment="Stretch" Margin="96,10,119,0" VerticalAlignment="Top" Height="21" Click="OnCopyClick"/>
+
+
+	</Grid>
 </Window>
