@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
@@ -33,7 +34,9 @@ namespace SPP_Laba1
             
             foreach (var fileName in ofd.FileNames)
             {
-                TreeView.Items.Add(LoadAssembly(fileName));
+	            try { TreeView.Items.Add(LoadAssembly(fileName)); }
+	            catch(BadImageFormatException ex) { MessageBox.Show(this, ex.Message + " File: " + ex.FileName, "Error"); }
+	            catch(FileNotFoundException ex) { MessageBox.Show(this, ex.Message + " File: " + ex.FileName, "Error"); }
             }
 
             TreeView.Items.SortDescriptions.Clear();
@@ -83,7 +86,7 @@ namespace SPP_Laba1
             var header = member.Name;
             header = header.PadRight(nameLength);
             header += "MemberType : " + Enum.GetName(typeof(MemberTypes), member.MemberType);
-            header = header.PadRight(nameLength + 40);
+            header = header.PadRight(nameLength + 30);
             switch (member.MemberType)
             {
                 case MemberTypes.Event:

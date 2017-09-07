@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SPP_Laba1"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="350" Width="525" WindowState="Maximized">
+		
 	<Grid>
 		<Button Content="Load assembly" HorizontalAlignment="Stretch" Margin="10,10,10,10" VerticalAlignment="Top" Click="LoadAssembly_Click"/>
 		<TreeView x:Name="TreeView" HorizontalAlignment="Stretch" Margin="10,40,10,10" VerticalAlignment="Stretch" FontFamily="Consolas"/>
