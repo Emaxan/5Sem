@@ -94,28 +94,19 @@ namespace SPP_Laba1
                 case MemberTypes.All:
                     break;
                 case MemberTypes.Constructor:
-                    header += ((ConstructorInfo)member).DeclaringType?.Name;
+                    header += getTypeName(((ConstructorInfo)member).DeclaringType);
                     break;
                 case MemberTypes.Method:
                     var method = (MethodInfo)member;
-                    header += method.ReturnType.Name;
-                    header = header.PadRight(nameLength + 100);
-                    if(method.ReturnType.IsGenericType)
-                    {
-                        header += method.ReturnType.GetGenericArguments().
-                            Aggregate("Generic parameters : ", (cur, type) => cur + type.Name + ",");
-                        header = header.Remove(header.Length - 1);
-                    }
+	                header += getTypeName(method.ReturnType);
                     
                     break;
                 case MemberTypes.Property:
-                    header += ((PropertyInfo)member).PropertyType.Name;
+                    header += getTypeName(((PropertyInfo)member).PropertyType);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-
-            header = header.PadRight(nameLength + 180);
             item.Header = header;
 
             item.Items.SortDescriptions.Clear();
@@ -124,18 +115,22 @@ namespace SPP_Laba1
             return item;
         }
 
-        private string getTypeName(Type type)
-        {
-            var name = "";
+        private string getTypeName(Type type) {
+	        if(type == null) {
+		        return "";
+	        }
+
+			var name = "";
             name += type.Name;
             if(!type.IsGenericType)
             {
                 return name;
             }
-
-            name += type.GetGenericArguments().
-                Aggregate("Generic parameters : ", (cur, t) => cur + t.Name + ",");
-            name = name.Remove(name.Length - 1);
+	        name = name.Remove(name.Length - 2);
+	        name += "<";
+	        name += type.GetGenericArguments().Aggregate("", (cur, t) => cur + getTypeName(t) + ", ");
+            name = name.Remove(name.Length - 2);
+	        name += ">";
             return name;
         }
     }
