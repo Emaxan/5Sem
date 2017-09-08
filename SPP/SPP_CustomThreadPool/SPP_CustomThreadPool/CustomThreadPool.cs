@@ -9,7 +9,7 @@ namespace SPP_CustomThreadPool
 	public delegate void UserTask();
 
 	[UsedImplicitly]
-	public class CustomThreadPool
+	public class CustomThreadPool : IDisposable
 	{
 		private List<TaskItem> _pool;
 		private Queue<TaskHandle> _readyQueue;
@@ -44,8 +44,10 @@ namespace SPP_CustomThreadPool
 														foreach(var ti in _pool) // while reading the pool another thread should not add/remove to that pool
 															lock(ti) // locking item
 															{
-																if(ti.TaskState != TaskState.Completed)
+															    if(ti.TaskState != TaskState.Completed)
+															    {
 																	continue; // if in the Pool task state is completed then a different task can be handed over to that thread
+															    }
 																ti.TaskHandle = readyItem;
 																ti.TaskState = TaskState.NotStarted;
 																added = true;
@@ -95,26 +97,9 @@ namespace SPP_CustomThreadPool
 
 		private void InitPoolWithMinCapacity()
 		{
-			for(var i = 0; i <= Min; i++)
+			for(var i = 0; i < Min; i++)
 			{
-				var ti = new TaskItem
-						{
-							TaskState = TaskState.NotStarted,
-							TaskHandle = new TaskHandle
-										{
-											Task = () =>
-													{
-													},
-											Callback = taskStatus =>
-														{
-														},
-											Token = new ClientHandle
-													{
-														Id = Guid.NewGuid()
-													}
-										}
-						};
-				AddTaskToPool(ti);
+				AddEmptyTaskToPool();
 			}
 		}
 
@@ -145,7 +130,12 @@ namespace SPP_CustomThreadPool
 						}
 						if(enter)
 						{
-							var taskStatus = new TaskStatus();
+						    
+							var taskStatus = new TaskStatus
+							                 {
+                                                 Number = _pool.IndexOf(taskItem),
+                                                 Id = taskItem.TaskHandle.Token.Id
+							                 };
 							try
 							{
 								taskItem.TaskHandle.Task.Invoke(); // execute the UserTask
@@ -179,11 +169,11 @@ namespace SPP_CustomThreadPool
 					}
 					while(true); // it's a continuous loop until task gets abort request
 				});
-			taskItem.Handler.Start();
 			lock(_criticalLock) // always use this lock for Pool
 			{
 				_pool.Add(taskItem);
 			}
+			taskItem.Handler.Start();
 		}
 
 		private void CleanupPool()
@@ -230,33 +220,43 @@ namespace SPP_CustomThreadPool
 				}
 				while(_pool.Count < Min)
 				{
-					var ti = new TaskItem
-							{
-								TaskState = TaskState.NotStarted,
-								TaskHandle = new TaskHandle
-											{
-												Task = () =>
-														{
-														},
-												Token = new ClientHandle
-														{
-															Id = Guid.NewGuid()
-														}
-											}
-							};
-					ti.TaskHandle.Callback = taskStatus =>
-											{
-											};
-					AddTaskToPool(ti);
+				    AddEmptyTaskToPool();
 				}
 			}
 		}
 
-		#region public interface
+	    private void AddEmptyTaskToPool()
+	    {
+	        var ti = new TaskItem
+	                 {
+	                     TaskState = TaskState.NotStarted,
+	                     TaskHandle = new TaskHandle
+	                                  {
+	                                      Task = () =>
+	                                             {
+	                                             },
+	                                      Token = new ClientHandle
+	                                              {
+	                                                  Id = Guid.NewGuid()
+	                                              }
+	                                  }
+	                 };
+	        ti.TaskHandle.Callback = taskStatus =>
+	                                 {
+	                                 };
+	        AddTaskToPool(ti);
+	    }
 
-		// Locks
-		private readonly object _syncLock = new object();
+        #region public interface
 
+        
+        /// <summary>
+        /// Lock for ReadyQueue
+        /// </summary>
+        private readonly object _syncLock = new object();
+        /// <summary>
+        /// Lock for Pool
+        /// </summary>
 		private readonly object _criticalLock = new object();
 
 		public ClientHandle QueueUserTask(UserTask task, Action<TaskStatus> callback)
@@ -336,7 +336,7 @@ namespace SPP_CustomThreadPool
 
 		#endregion
 
-		#region singleton instance of threadpool
+		#region singleton instance of thread pool
 
 		private CustomThreadPool()
 		{
@@ -345,6 +345,35 @@ namespace SPP_CustomThreadPool
 
 		public static CustomThreadPool GetInstance { get; } = new CustomThreadPool();
 
-		#endregion
+        #endregion
+
+	    #region IDisposable pattern
+
+        private void ReleaseUnmanagedResources()
+	    {
+            _taskScheduler.Abort();
+            lock(_criticalLock)
+            {
+                foreach (var item in _pool)
+	            {
+	                CancelUserTask(item.TaskHandle.Token);
+                    item.Handler.Abort();
+	            }
+                _pool.Clear();
+            }
+	    }
+
+	    public void Dispose()
+	    {
+	        ReleaseUnmanagedResources();
+	        GC.SuppressFinalize(this);
+	    }
+
+	    ~CustomThreadPool()
+	    {
+	        ReleaseUnmanagedResources();
+	    }
+
+	    #endregion
 	}
 }
