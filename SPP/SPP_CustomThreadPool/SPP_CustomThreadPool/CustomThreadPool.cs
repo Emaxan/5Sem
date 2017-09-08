@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using JetBrains.Annotations;
 
 namespace SPP_CustomThreadPool
 {
 	public delegate void UserTask();
 
+	[UsedImplicitly]
 	public class CustomThreadPool
 	{
 		private List<TaskItem> _pool;
@@ -52,7 +54,8 @@ namespace SPP_CustomThreadPool
 															}
 
 														if(!added && _pool.Count < Max)
-														{ // if all threads in pool are busy and the count is still less than the Max
+														{ 
+															// if all threads in pool are busy and the count is still less than the Max
 															// limit set then create a new thread and add that to pool
 															var ti = new TaskItem
 																	{
@@ -324,8 +327,8 @@ namespace SPP_CustomThreadPool
 
 		#region configurable items
 
-		private const int Max = 8; // maximum no of threads in pool
-		private const int Min = 3; // minimum no of threads in pool
+		private const int Max = 50; // maximum no of threads in pool
+		private const int Min = 10; // minimum no of threads in pool
 		private const int MinWait = 10; // milliseconds
 		private const int MaxWait = 15000; // milliseconds - threshold for simple task
 		private const int CleanupInterval = 60000; // millisecond - to free waiting threads in pool
