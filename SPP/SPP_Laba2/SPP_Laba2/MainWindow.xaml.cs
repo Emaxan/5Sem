@@ -1,8 +1,7 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Security.AccessControl;
-using System.Security.Principal;
 using System.Windows;
 using System.Windows.Controls;
 using SPP_CustomThreadPool;
@@ -11,7 +10,6 @@ namespace SPP_Laba2
 {
 	public partial class MainWindow
 	{
-		public CustomThreadPool Pool;
 		private string _sourcePath;
 		private string _destinationPath;
 
@@ -39,17 +37,6 @@ namespace SPP_Laba2
 				TwSource.Items.Add(source);
 				TwDestination.Items.Add(destination);
 			}
-
-			//Pool = CustomThreadPool.GetInstance;
-			//var task = Pool.QueueUserTask(
-			//	() =>
-			//	{
-			//		// do smth
-			//	},
-			//	ts =>
-			//	{
-			//		// callback
-			//	});
 		}
 
 		private void Item_Expanded(object sender, RoutedEventArgs e)
@@ -85,6 +72,11 @@ namespace SPP_Laba2
 			_destinationPath = (string)((TreeViewItem)e.NewValue).Tag;
 		}
 
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            CustomThreadPool.GetInstance.Dispose();
+        }
+
 		private void OnCopyClick(object sender, RoutedEventArgs e)
 		{
 			if(_destinationPath==null || !new DirectoryInfo(_destinationPath).Exists)
@@ -97,11 +89,24 @@ namespace SPP_Laba2
 				MessageBox.Show(this, "You should select existing source folder first!", "Error!");
 				return;
 			}
-
-			CopyFolder(_sourcePath, _destinationPath);
+            var w = new BackgroundWorker();
+            w.DoWork += WorkerOnDoWork;
+            w.RunWorkerAsync(new
+                             {
+                                 _sourcePath,
+                                 _destinationPath
+                             });
 		}
 
-		private void CopyFolder(string sourcePath, string destinationPath)
+	    private void WorkerOnDoWork(object sender, DoWorkEventArgs doWorkEventArgs)
+	    {
+	        var arg = doWorkEventArgs.Argument;
+	        var sourcePath = ((dynamic)arg)._sourcePath;
+	        var destinationPath = ((dynamic)arg)._destinationPath;
+            CopyFolder(sourcePath, destinationPath);
+        }
+
+	    private void CopyFolder(string sourcePath, string destinationPath)
 		{
 			var dir = new DirectoryInfo(sourcePath);
 			foreach(var directory in dir.GetDirectories())
@@ -115,16 +120,35 @@ namespace SPP_Laba2
 			{
 				try
 				{
-					var destination = Path.Combine(destinationPath, file.Name);
-					LbLog.Items.Add(file.FullName + " -> " + destination);
-					file.CopyTo(destination);
+                    var pool = CustomThreadPool.GetInstance;
+				    var destination = Path.Combine(destinationPath, file.Name);
+                    pool.QueueUserTask(
+                        () =>
+                        {
+                            var dest = destination;
+                            file.CopyTo(dest, true);
+                        },
+                        ts =>
+                        {
+                            var message = file.FullName + " -> " + destination;
+                            Dispatcher.Invoke(() =>
+                                              {
+                                                  LbLog.Items.Add(ts.Number +
+                                                                  (ts.Success ? " Success: " : " Fail: ") +
+                                                                  message +
+                                                                  (ts.Success
+                                                                       ? ""
+                                                                       : " : " + ts.InnerException.Message));
+                                                  LbLog.Items.MoveCurrentToLast();
+                                                  LbLog.ScrollIntoView(LbLog.Items.CurrentItem);
+                                              });
+                        });
 				}
 				catch(Exception ex)
 				{
-
 					LbLog.Items.Add(ex.Message);
 				}
 			}
 		}
-	}
+    }
 }
