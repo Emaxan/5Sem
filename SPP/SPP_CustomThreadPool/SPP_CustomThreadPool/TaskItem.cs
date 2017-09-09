@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace SPP_CustomThreadPool
 {
-	internal class TaskItem // running items in the pool - TaskHandle gets a thread to execute it 
+	internal class TaskItem
 	{
 		public Thread Handler;
 		public DateTime StartTime = DateTime.MaxValue;

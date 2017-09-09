@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 
 namespace SPP_CustomThreadPool
 {
-	public delegate void UserTask();
+	public delegate bool UserTask();
 
 	[UsedImplicitly]
 	public class CustomThreadPool : IDisposable
@@ -20,74 +20,76 @@ namespace SPP_CustomThreadPool
 			_readyQueue = new Queue<TaskHandle>();
 			_pool = new List<TaskItem>();
 
-			InitPoolWithMinCapacity(); // initialize Pool with Minimum capacity - that much thread must be kept ready
+			InitPoolWithMinCapacity();
 
-			var lastCleanup = DateTime.Now; // monitor this time for next cleaning activity
+			var lastCleanup = DateTime.Now;
 
 			_taskScheduler = new Thread(
 									() =>
 									{
 										do
 										{
-											lock(_syncLock) // obtaining lock for ReadyQueue
+											lock(_syncLock)
 											{
 												while(_readyQueue.Count > 0 && _readyQueue.Peek().Task == null)
-													_readyQueue.Dequeue(); // remove canceled item/s - canceled item will have it's task set to null
+												{
+													_readyQueue.Dequeue();
+												}
 
 												var itemCount = _readyQueue.Count;
 												for(var i = 0; i < itemCount; i++)
 												{
-													var readyItem = _readyQueue.Peek(); // the Top item of queue
+													var readyItem = _readyQueue.Peek();
 													var added = false;
-													lock(_criticalLock) // lock for the Pool
+													lock(_criticalLock)
 													{
-														foreach(var ti in _pool) // while reading the pool another thread should not add/remove to that pool
-															lock(ti) // locking item
+														foreach(var ti in _pool)
+														{
+															lock(ti)
 															{
-															    if(ti.TaskState != TaskState.Completed)
-															    {
-																	continue; // if in the Pool task state is completed then a different task can be handed over to that thread
-															    }
+																if(ti.TaskState != TaskState.Completed)
+																{
+																	continue;
+																}
 																ti.TaskHandle = readyItem;
 																ti.TaskState = TaskState.NotStarted;
 																added = true;
 																_readyQueue.Dequeue();
 																break;
 															}
+														}
 
-														if(!added && _pool.Count < Max)
-														{ 
-															// if all threads in pool are busy and the count is still less than the Max
-															// limit set then create a new thread and add that to pool
+														if(!added && _pool.Count < _max)
+														{
 															var ti = new TaskItem
 																	{
 																		TaskState = TaskState.NotStarted,
 																		TaskHandle = readyItem
 																	};
-															// add a new TaskItem in the pool
 															AddTaskToPool(ti);
 															added = true;
 															_readyQueue.Dequeue();
 														}
 													}
 													if(!added)
-														break; // It's already crowded so try after sometime
+													{
+														break;
+													}
 												}
 											}
 											if(DateTime.Now - lastCleanup > TimeSpan.FromMilliseconds(CleanupInterval))
-												// It's long time - so try to cleanup Pool once.
 											{
 												CleanupPool();
 												lastCleanup = DateTime.Now;
 											}
 											else
 											{
-												Thread.Yield(); // either of these two can work - the combination is also fine for our demo. 
-												Thread.Sleep(SchedulingInterval); // Don't run madly in a loop - wait for sometime for things to change.
-												// the wait should be minimal - close to zero
+												Thread.Yield();
+												Thread.Sleep(SchedulingInterval);
 											}
 										}
 										while(true);
+										// ReSharper disable once FunctionNeverReturns
 									})
 								{
 									Priority = ThreadPriority.AboveNormal
@@ -97,7 +99,7 @@ namespace SPP_CustomThreadPool
 
 		private void InitPoolWithMinCapacity()
 		{
-			for(var i = 0; i < Min; i++)
+			for(var i = 0; i < _min; i++)
 			{
 				AddEmptyTaskToPool();
 			}
@@ -112,14 +114,11 @@ namespace SPP_CustomThreadPool
 					{
 						var enter = false;
 						lock(taskItem)
-							// the taskState of taskItem is exposed to scheduler
-							// thread also so access that always with this lock
-						{ // Only two thread can contend for this [cancel and executing
-							// thread as taskItem itself is mapped to a dedicated thread]
-							// if aborted then allow it to exit the loop so that it can complete and free-up thread resource.
-							// this state means it has been removed from Pool already.
+						{
 							if(taskItem.TaskState == TaskState.Aborted)
+							{
 								break;
+							}
 
 							if(taskItem.TaskState == TaskState.NotStarted)
 							{
@@ -130,15 +129,13 @@ namespace SPP_CustomThreadPool
 						}
 						if(enter)
 						{
-						    
 							var taskStatus = new TaskStatus
-							                 {
-                                                 Number = _pool.IndexOf(taskItem),
-                                                 Id = taskItem.TaskHandle.Token.Id
-							                 };
+											{
+												Pid = Thread.CurrentThread.ManagedThreadId
+											};
 							try
 							{
-								taskItem.TaskHandle.Task.Invoke(); // execute the UserTask
+								taskItem.TaskHandle.Task.Invoke();
 								taskStatus.Success = true;
 							}
 							catch(Exception ex)
@@ -146,30 +143,29 @@ namespace SPP_CustomThreadPool
 								taskStatus.Success = false;
 								taskStatus.InnerException = ex;
 							}
-							lock(taskItem) // Only two thread can contend for this [cancel and executing
-								// thread as taskItem itself is mapped to a dedicated thread]
+							lock(taskItem)
 							{
 								if(taskItem.TaskHandle.Callback != null && taskItem.TaskState != TaskState.Aborted)
+								{
 									try
 									{
 										taskItem.TaskState = TaskState.Completed;
 										taskItem.StartTime = DateTime.MaxValue;
 
-										taskItem.TaskHandle.Callback(taskStatus); // notify callback with task-status
+										taskItem.TaskHandle.Callback(taskStatus);
 									}
 									catch
 									{
 										// suppress exception
 									}
+								}
 							}
 						}
-						// give other thread a chance to execute as it's current execution completed already
 						Thread.Yield();
-						Thread.Sleep(MinWait); //TODO: need to see if Sleep is required here
 					}
-					while(true); // it's a continuous loop until task gets abort request
+					while(true);
 				});
-			lock(_criticalLock) // always use this lock for Pool
+			lock(_criticalLock)
 			{
 				_pool.Add(taskItem);
 			}
@@ -179,24 +175,24 @@ namespace SPP_CustomThreadPool
 		private void CleanupPool()
 		{
 			List<TaskItem> filteredTask;
-			lock(_criticalLock) // acquiring lock for Pool
+			lock(_criticalLock)
 			{
 				filteredTask = _pool.Where(
 										ti => ti.TaskHandle.Token.IsSimpleTask && DateTime.Now - ti.StartTime > TimeSpan.FromMilliseconds(MaxWait))
 									.ToList();
 			}
 			foreach(var taskItem in filteredTask)
+			{
 				CancelUserTask(taskItem.TaskHandle.Token);
+			}
 			lock(_criticalLock)
 			{
 				filteredTask = _pool.Where(ti => ti.TaskState == TaskState.Aborted).ToList();
-				foreach(var taskItem in filteredTask) // clean all aborted thread
+				foreach(var taskItem in filteredTask)
 				{
 					try
 					{
-						taskItem.Handler.Abort(); // does not work
-						taskItem.Handler.Priority = ThreadPriority.Lowest;
-						taskItem.Handler.IsBackground = true;
+						taskItem.Handler.Abort();
 					}
 					catch
 					{
@@ -205,7 +201,7 @@ namespace SPP_CustomThreadPool
 					_pool.Remove(taskItem);
 				}
 				var total = _pool.Count;
-				if(total >= Min) // clean waiting threads over minimum limit
+				if(total >= _min)
 				{
 					filteredTask = _pool.Where(ti => ti.TaskState == TaskState.Completed).ToList();
 					foreach(var taskItem in filteredTask)
@@ -214,52 +210,51 @@ namespace SPP_CustomThreadPool
 						taskItem.TaskState = TaskState.Aborted;
 						_pool.Remove(taskItem);
 						total--;
-						if(total == Min)
+						if(total == _min)
 							break;
 					}
 				}
-				while(_pool.Count < Min)
+				while(_pool.Count < _min)
 				{
-				    AddEmptyTaskToPool();
+					AddEmptyTaskToPool();
 				}
 			}
 		}
 
-	    private void AddEmptyTaskToPool()
-	    {
-	        var ti = new TaskItem
-	                 {
-	                     TaskState = TaskState.NotStarted,
-	                     TaskHandle = new TaskHandle
-	                                  {
-	                                      Task = () =>
-	                                             {
-	                                             },
-	                                      Token = new ClientHandle
-	                                              {
-	                                                  Id = Guid.NewGuid()
-	                                              }
-	                                  }
-	                 };
-	        ti.TaskHandle.Callback = taskStatus =>
-	                                 {
-	                                 };
-	        AddTaskToPool(ti);
-	    }
+		private void AddEmptyTaskToPool()
+		{
+			var ti = new TaskItem
+					{
+						TaskState = TaskState.NotStarted,
+						TaskHandle = new TaskHandle
+									{
+										Task = () => true,
+										Token = new ClientHandle
+												{
+													Id = Guid.NewGuid()
+												}
+									}
+					};
+			ti.TaskHandle.Callback = taskStatus =>
+									{
+									};
+			AddTaskToPool(ti);
+		}
 
-        #region public interface
+		#region public interface
 
-        
-        /// <summary>
-        /// Lock for ReadyQueue
-        /// </summary>
-        private readonly object _syncLock = new object();
-        /// <summary>
-        /// Lock for Pool
-        /// </summary>
+		/// <summary>
+		///     Lock for ReadyQueue
+		/// </summary>
+		private readonly object _syncLock = new object();
+
+		/// <summary>
+		///     Lock for Pool
+		/// </summary>
 		private readonly object _criticalLock = new object();
 
-		public ClientHandle QueueUserTask(UserTask task, Action<TaskStatus> callback)
+		[UsedImplicitly]
+		public ClientHandle QueueUserTask(UserTask task, Action<TaskStatus> callback = null)
 		{
 			var th = new TaskHandle
 					{
@@ -270,49 +265,50 @@ namespace SPP_CustomThreadPool
 								},
 						Callback = callback
 					};
-			lock(_syncLock) // main-lock - will be used for accessing ReadyQueue always
+			lock(_syncLock)
 			{
 				_readyQueue.Enqueue(th);
 			}
 			return th.Token;
 		}
 
+		// ReSharper disable once MemberCanBePrivate.Global
 		public static void CancelUserTask(ClientHandle clientToken)
 		{
-			lock(GetInstance._syncLock)
+			lock(GetInstance()._syncLock)
 			{
-				var thandle = GetInstance._readyQueue.FirstOrDefault(th => th.Token.Id == clientToken.Id);
-				if(thandle != null) // in case task is still in queue only
+				var thandle = GetInstance()._readyQueue.FirstOrDefault(th => th.Token.Id == clientToken.Id);
+				if(thandle != null)
 				{
 					thandle.Task = null;
 					thandle.Callback = null;
 					thandle.Token = null;
 				}
-				else // in case thread is running the task - try aborting the thread to cancel the operation (rude behavior)
+				else
 				{
-					var itemCount = GetInstance._readyQueue.Count;
 					TaskItem taskItem;
-					lock(GetInstance._criticalLock)
+					lock(GetInstance()._criticalLock)
 					{
-						taskItem = GetInstance._pool.FirstOrDefault(task => task.TaskHandle.Token.Id == clientToken.Id);
+						taskItem = GetInstance()._pool.FirstOrDefault(task => task.TaskHandle.Token.Id == clientToken.Id);
 					}
 					if(taskItem == null)
+					{
 						return;
-					lock(taskItem) // only item need the locking
+					}
+					lock(taskItem)
 					{
 						if(taskItem.TaskState != TaskState.Completed)
-							// double check - in case by the time this lock obtained callback already happened
 						{
 							taskItem.TaskState = TaskState.Aborted;
-							taskItem.TaskHandle.Callback = null; // stop callback
+							taskItem.TaskHandle.Callback = null;
 						}
 						if(taskItem.TaskState != TaskState.Aborted)
+						{
 							return;
+						}
 						try
 						{
-							taskItem.Handler.Abort(); // **** it does not work ****
-							taskItem.Handler.Priority = ThreadPriority.BelowNormal;
-							taskItem.Handler.IsBackground = true;
+							taskItem.Handler.Abort();
 						}
 						catch
 						{
@@ -327,9 +323,8 @@ namespace SPP_CustomThreadPool
 
 		#region configurable items
 
-		private const int Max = 50; // maximum no of threads in pool
-		private const int Min = 10; // minimum no of threads in pool
-		private const int MinWait = 10; // milliseconds
+		private readonly int _max; // maximum no of threads in pool
+		private readonly int _min; // minimum no of threads in pool
 		private const int MaxWait = 15000; // milliseconds - threshold for simple task
 		private const int CleanupInterval = 60000; // millisecond - to free waiting threads in pool
 		private const int SchedulingInterval = 10; // millisecond - look for task in queue in loop
@@ -338,42 +333,62 @@ namespace SPP_CustomThreadPool
 
 		#region singleton instance of thread pool
 
-		private CustomThreadPool()
+		private CustomThreadPool(int min, int max)
 		{
+			_min = min;
+			_max = max;
 			InitializeThreadPool();
 		}
 
-		public static CustomThreadPool GetInstance { get; } = new CustomThreadPool();
+		private static CustomThreadPool _instance;
+		private static readonly object Locker = new object();
 
-        #endregion
+		// ReSharper disable once MemberCanBePrivate.Global
+		public static CustomThreadPool GetInstance(int min = 50, int max = 50)
+		{
+			// ReSharper disable once InvertIf
+			if(_instance == null)
+			{
+				lock(Locker)
+				{
+					if(_instance == null)
+					{
+						_instance = new CustomThreadPool(min, max);
+					}
+				}
+			}
+			return _instance;
+		}
 
-	    #region IDisposable pattern
+		#endregion
 
-        private void ReleaseUnmanagedResources()
-	    {
-            _taskScheduler.Abort();
-            lock(_criticalLock)
-            {
-                foreach (var item in _pool)
-	            {
-	                CancelUserTask(item.TaskHandle.Token);
-                    item.Handler.Abort();
-	            }
-                _pool.Clear();
-            }
-	    }
+		#region IDisposable pattern
 
-	    public void Dispose()
-	    {
-	        ReleaseUnmanagedResources();
-	        GC.SuppressFinalize(this);
-	    }
+		private void ReleaseUnmanagedResources()
+		{
+			_taskScheduler.Abort();
+			lock(_criticalLock)
+			{
+				foreach(var item in _pool)
+				{
+					item.TaskState = TaskState.Aborted;
+					item.Handler.Abort();
+				}
+				_pool.Clear();
+			}
+		}
 
-	    ~CustomThreadPool()
-	    {
-	        ReleaseUnmanagedResources();
-	    }
+		public void Dispose()
+		{
+			ReleaseUnmanagedResources();
+			GC.SuppressFinalize(this);
+		}
 
-	    #endregion
+		~CustomThreadPool()
+		{
+			ReleaseUnmanagedResources();
+		}
+
+		#endregion
 	}
 }
