@@ -26,11 +26,17 @@ namespace SPP_Laba3
 
 		private void OnFlush(List<object> items)
 		{
-			Dispatcher.Invoke(
-				() =>
-				{
-					LbLog.Items.Add("Flushing buffer");
-				});
+			try
+			{
+				Dispatcher.Invoke(
+					() =>
+					{
+						LbLog.Items.Add("Flushing buffer");
+					});
+			}
+			catch(OperationCanceledException ex)
+			{
+			}
 		}
 
 		private void UpdateObjectCount(object sender, int e)
@@ -100,7 +106,7 @@ namespace SPP_Laba3
 		{
 			foreach(var t in _threads)
 			{
-				_threadOff[t] = false;
+				t.Abort();
 			}
 			_accumulator.Dispose();
 		}
