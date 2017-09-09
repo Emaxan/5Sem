@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace SPP_Laba3
 {
@@ -31,24 +32,28 @@ namespace SPP_Laba3
 		{
 			while(_timerOn)
 			{
+				Thread.Sleep(_timeSpan);
+				List<object> buf;
 				lock(_buffer)
 				{
-					_onFlush(_buffer);
+					buf = _buffer;
+					Task.Run(() => _onFlush(buf));
 					_buffer.Clear();
 				}
 				OnObjectCountChange?.Invoke(this, _buffer.Count);
-				Thread.Sleep(_timeSpan);
 			}
 		}
 
 		public void Add(object item)
 		{
+			List<object> buf;
 			lock(_buffer)
 			{
 				_buffer.Add(item);
+				buf = _buffer;
 				if(_buffer.Count == _maxObjectsCount)
 				{
-					_onFlush(_buffer);
+					Task.Run(() => _onFlush(buf));
 					_buffer.Clear();
 				}
 			}
