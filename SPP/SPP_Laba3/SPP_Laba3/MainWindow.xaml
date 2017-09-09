@@ -1,0 +1,38 @@
+﻿<Window x:Class="SPP_Laba3.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SPP_Laba3"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="525" Closing="OnWindowClosing">
+    <Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="150"/>
+			<RowDefinition/>
+		</Grid.RowDefinitions>
+		<Grid Grid.Row="0" Height="150" VerticalAlignment="Top" HorizontalAlignment="Stretch">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition/>
+				<ColumnDefinition/>
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition/>
+				<RowDefinition Height="2*"/>
+			</Grid.RowDefinitions>
+			<Button x:Name="BAdd" Grid.Column="0" Grid.Row="0" Content="Add thread" HorizontalAlignment="Stretch" Margin="10" VerticalAlignment="Stretch" Click="BAdd_Click" />
+			<Button x:Name="BRemove" Grid.Column="1" Grid.Row="0" Content="Remove thread" HorizontalAlignment="Stretch" Margin="10" VerticalAlignment="Stretch" Click="BRemove_Click" />
+			<Border Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10" BorderThickness="1" BorderBrush="Black" CornerRadius="10">
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition/>
+						<ColumnDefinition/>
+					</Grid.ColumnDefinitions>
+					<Label x:Name="LThreads" Grid.Column="0" Content="Thread count : " Margin="10" VerticalContentAlignment="Center"/>
+					<Label x:Name="LObjects" Grid.Column="1" Content="Objects in buffer : " Margin="10" VerticalContentAlignment="Center"/>
+				</Grid>
+			</Border>
+		</Grid>
+		<ListBox x:Name="LbLog" Grid.Row="1" HorizontalAlignment="Stretch" Margin="10,10,10,10" VerticalAlignment="Stretch" />
+	</Grid>
+</Window>
