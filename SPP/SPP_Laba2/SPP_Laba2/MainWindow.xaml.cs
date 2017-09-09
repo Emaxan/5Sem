@@ -12,6 +12,9 @@ namespace SPP_Laba2
 	{
 		private string _sourcePath;
 		private string _destinationPath;
+		private long _countTotal; 
+		private long _countCopied;
+
 
 		public MainWindow()
 		{
@@ -38,6 +41,7 @@ namespace SPP_Laba2
 				TwDestination.Items.Add(destination);
 			}
 		}
+
 
 		private void Item_Expanded(object sender, RoutedEventArgs e)
 		{
@@ -74,7 +78,7 @@ namespace SPP_Laba2
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            CustomThreadPool.GetInstance.Dispose();
+            CustomThreadPool.GetInstance().Dispose();
         }
 
 		private void OnCopyClick(object sender, RoutedEventArgs e)
@@ -98,13 +102,15 @@ namespace SPP_Laba2
                              });
 		}
 
-	    private void WorkerOnDoWork(object sender, DoWorkEventArgs doWorkEventArgs)
+		private void WorkerOnDoWork(object sender, DoWorkEventArgs doWorkEventArgs)
 	    {
+		    _countTotal = 0;
+		    _countCopied = 0;
 	        var arg = doWorkEventArgs.Argument;
 	        var sourcePath = ((dynamic)arg)._sourcePath;
 	        var destinationPath = ((dynamic)arg)._destinationPath;
             CopyFolder(sourcePath, destinationPath);
-        }
+	    }
 
 	    private void CopyFolder(string sourcePath, string destinationPath)
 		{
@@ -112,36 +118,49 @@ namespace SPP_Laba2
 			foreach(var directory in dir.GetDirectories())
 			{
 				var newDir = new DirectoryInfo(Path.Combine(destinationPath, directory.Name));
-				LbLog.Items.Add("Create " + newDir.FullName);
+				Dispatcher.Invoke(() => LbLog.Items.Add("Create " + newDir.FullName));
 				newDir.Create();
 				CopyFolder(directory.FullName, newDir.FullName);
 			}
 			foreach (var file in dir.GetFiles())
 			{
+				_countTotal++;
+				Dispatcher.Invoke(() => PbProgress.Maximum = _countTotal);
 				try
 				{
-                    var pool = CustomThreadPool.GetInstance;
+                    var pool = CustomThreadPool.GetInstance();
 				    var destination = Path.Combine(destinationPath, file.Name);
                     pool.QueueUserTask(
                         () =>
                         {
-                            var dest = destination;
-                            file.CopyTo(dest, true);
+                            file.CopyTo(destination, true);
+	                        return true;
                         },
                         ts =>
                         {
-                            var message = file.FullName + " -> " + destination;
-                            Dispatcher.Invoke(() =>
-                                              {
-                                                  LbLog.Items.Add(ts.Number +
-                                                                  (ts.Success ? " Success: " : " Fail: ") +
-                                                                  message +
-                                                                  (ts.Success
-                                                                       ? ""
-                                                                       : " : " + ts.InnerException.Message));
-                                                  LbLog.Items.MoveCurrentToLast();
-                                                  LbLog.ScrollIntoView(LbLog.Items.CurrentItem);
-                                              });
+								lock (this)
+								{
+
+									if(ts.Success)
+									{
+										_countCopied++;
+									}
+									var message = file.FullName + " -> " + destination;
+									Dispatcher.Invoke(() =>
+													{
+														LbLog.Items.Add(ts.Pid.ToString().PadRight(5) + 
+																		(ts.Success ? "Success: " : "Fail: ").PadRight("Success: ".Length) +
+																		message +
+																		(ts.Success
+																			? ""
+																			: " : " + ts.InnerException.Message));
+														LbLog.Items.MoveCurrentToLast();
+														LbLog.ScrollIntoView(LbLog.Items.CurrentItem);
+														PbProgress.Value = _countCopied;
+														LProgress.Content = $"{_countCopied}/{_countTotal}";
+													});
+								}
+							
                         });
 				}
 				catch(Exception ex)

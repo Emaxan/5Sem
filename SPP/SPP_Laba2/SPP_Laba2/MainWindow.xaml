@@ -18,11 +18,14 @@
 				<RowDefinition MinHeight="100"/>
 				<RowDefinition Height="10"/>
 				<RowDefinition MinHeight="100"/>
+				<RowDefinition Height="20"/>
 			</Grid.RowDefinitions>
 			<TreeView Grid.Column="0" Grid.Row="0" x:Name="TwSource"  HorizontalAlignment="Stretch" Margin="10" VerticalAlignment="Stretch" SelectedItemChanged="OnSourceChanged"/>
 			<TreeView Grid.Column="1" Grid.Row="0" x:Name="TwDestination" HorizontalAlignment="Stretch" Margin="10" VerticalAlignment="Stretch" SelectedItemChanged="OnDestinationChanged"/>
-			<ListBox Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2" x:Name="LbLog" HorizontalAlignment="Stretch" Margin="10,10,10,10" VerticalAlignment="Stretch"/>
+			<ListBox Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="2" x:Name="LbLog" HorizontalAlignment="Stretch" Margin="10,10,10,10" VerticalAlignment="Stretch" FontFamily="Courier New"/>
 			<GridSplitter Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" Height="10" VerticalAlignment="Center" ResizeDirection="Rows"/>
+			<ProgressBar x:Name="PbProgress" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Value="0" Orientation="Vertical"/>
+			<Label x:Name="LProgress" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Padding="0"></Label>
 		</Grid>
 		<Button Content="Copy" HorizontalAlignment="Stretch" Margin="96,10,119,0" VerticalAlignment="Top" Height="21" Click="OnCopyClick"/>
 
