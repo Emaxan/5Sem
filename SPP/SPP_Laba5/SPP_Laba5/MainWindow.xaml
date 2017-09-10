@@ -7,6 +7,26 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
-        
-    </Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="50"/>
+			<RowDefinition Height="50"/>
+			<RowDefinition/>
+		</Grid.RowDefinitions>
+		<Label Grid.Row="0" Margin="0,0,120,0" VerticalContentAlignment="Center"/>
+		<Button Grid.Row="0" HorizontalAlignment="Right" Width="100" Margin="10" Content="Open source" Height="25" Click="OpenSource_Click"/>
+		<Label Grid.Row="1" Margin="0,0,120,0" VerticalContentAlignment="Center"/>
+	    <Button Grid.Row="1" HorizontalAlignment="Right" Width="100" Margin="10" Content="Open destination" Height="25" Click="OpenDestination_Click"/>
+		<Grid Grid.Row="2">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition/>
+				<ColumnDefinition/>
+			</Grid.ColumnDefinitions>
+			<Border Grid.Column="0" BorderThickness="10" BorderBrush="Green" Background="Green" CornerRadius="200" Height="200" Width="200" MouseUp="CopyClick" MouseEnter="Border_MouseEnter" MouseLeave="Border_MouseLeave">
+				<Label VerticalAlignment="Center" HorizontalAlignment="Center" Content="COPY" Foreground="White" FontSize="50" FontWeight="Bold"></Label>
+			</Border>
+			<Border Grid.Column="1" BorderThickness="10" BorderBrush="Red" Background="Red" CornerRadius="200" Height="200" Width="200" MouseUp="StopClick" MouseEnter="Border_MouseEnter" MouseLeave="Border_MouseLeave">
+				<Label VerticalAlignment="Center" HorizontalAlignment="Center" Content="Cancel" Foreground="White" FontSize="50" FontWeight="Bold"></Label>
+			</Border>
+		</Grid>
+	</Grid>
 </Window>
