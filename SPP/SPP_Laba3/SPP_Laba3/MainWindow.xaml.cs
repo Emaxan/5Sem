@@ -3,24 +3,26 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
+using SPP_CustomThreadPool;
 
 namespace SPP_Laba3
 {
 	public partial class MainWindow
 	{
-		private readonly List<Thread> _threads = new List<Thread>();
-		private readonly Dictionary<Thread, bool> _threadOff = new Dictionary<Thread, bool>();
+		private readonly List<ClientHandle> _handles = new List<ClientHandle>();
 		private readonly ConcurrentAccumulator _accumulator;
+        private readonly CustomThreadPool _pool;
+	    private const int MaxThreadCount = 1000;
+	    private const int MinThreadCount = 20;
 
-
-		public MainWindow()
+        public MainWindow()
 		{
 			InitializeComponent();
+            _pool = CustomThreadPool.GetInstance(MinThreadCount, MaxThreadCount);
 			_accumulator = new ConcurrentAccumulator(1000, 6000, OnFlush);
 			_accumulator.OnObjectCountChange += UpdateObjectCount;
-			LThreads.Content = $"Thread count: {_threads.Count}";
+			LThreads.Content = $"Thread count: {_handles.Count}";
 		}
 		
 
@@ -34,7 +36,7 @@ namespace SPP_Laba3
 						LbLog.Items.Add("Flushing buffer");
 					});
 			}
-			catch(OperationCanceledException ex)
+			catch(OperationCanceledException)
 			{
 			}
 		}
@@ -48,66 +50,62 @@ namespace SPP_Laba3
 				});
 		}
 
-		private void TaskFunction(object arg)
+		private bool TaskFunction()
 		{
 			while(true)
 			{
-				if(_threadOff[(Thread)arg])
-				{
-					_accumulator.Add(new object());
-				}
-				else
-				{
-					break;
-				}
+				_accumulator.Add(new object());
+				Thread.Sleep(100);
 			}
 		}
 
 		private void BAdd_Click(object sender, RoutedEventArgs e)
 		{
+		    if(_handles.Count == MaxThreadCount)
+		    {
+		        return;
+		    }
+
 			var added = false;
-			var thread = new Thread(TaskFunction);
+			var thread = _pool.QueueUserTask(TaskFunction);
 
 			try
 			{
-				_threads.Add(thread);
-				_threadOff.Add(thread, true);
-				thread.Start(thread);
+				_handles.Add(thread);
 				added = true;
 			}
 			catch(Exception exception)
 			{
 				LbLog.Items.Add(exception.Message);
-				_threads.Remove(thread);
-				_threadOff.Remove(thread);
+				_handles.Remove(thread);
 			}
 
 			if(added)
 			{
-				LThreads.Content = $"Thread count: {_threads.Count}";
+				LThreads.Content = $"Thread count: {_handles.Count}";
 			}
 		}
 
 		private void BRemove_Click(object sender, RoutedEventArgs e)
 		{
-			if(_threads.Count == 0)
+			if(_handles.Count == 0)
 			{
 				return;
 			}
 
-			var thread = _threads.First();
-			_threadOff[thread] = false;
-			_threads.Remove(thread);
-			LThreads.Content = $"Thread count: {_threads.Count}";
-			//thread.Join();
+			var thread = _handles.First();
+            CustomThreadPool.CancelUserTask(thread);
+			_handles.Remove(thread);
+			LThreads.Content = $"Thread count: {_handles.Count}";
 		}
 
 		private void OnWindowClosing(object sender, CancelEventArgs e)
 		{
-			foreach(var t in _threads)
+			foreach(var t in _handles)
 			{
-				t.Abort();
+				CustomThreadPool.CancelUserTask(t);
 			}
+            _pool.Dispose();
 			_accumulator.Dispose();
 		}
 	}

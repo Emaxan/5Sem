@@ -12,6 +12,7 @@ namespace SPP_Laba3
 		private readonly int _timeSpan;
 		private readonly FlushCallback _onFlush;
 		private bool _timerOn;
+	    private bool _disposed = false;
 		
 		public event EventHandler<int> OnObjectCountChange;
 		public delegate void FlushCallback(List<object> items);
@@ -30,7 +31,7 @@ namespace SPP_Laba3
 
 		private void TimerWork(object state)
 		{
-			while(_timerOn)
+			while(_timerOn && !_disposed)
 			{
 				Thread.Sleep(_timeSpan);
 				List<object> buf;
@@ -40,7 +41,10 @@ namespace SPP_Laba3
 					Task.Run(() => _onFlush(buf));
 					_buffer.Clear();
 				}
-				OnObjectCountChange?.Invoke(this, _buffer.Count);
+			    if(!_disposed)
+			    {
+			        OnObjectCountChange?.Invoke(this, _buffer.Count);
+			    }
 			}
 		}
 
@@ -58,17 +62,19 @@ namespace SPP_Laba3
 				}
 			}
 			OnObjectCountChange?.Invoke(this, _buffer.Count);
-			Thread.Sleep(100);
 		}
 
 		#region IDisposable pattern
 
 		private void Dispose(bool disposing)
 		{
-			if (disposing)
-			{
-				_timerOn = false;
-			}
+		    if(!disposing)
+		    {
+		        return;
+		    }
+
+		    _disposed = true;
+		    _timerOn = false;
 		}
 
 		public void Dispose()
