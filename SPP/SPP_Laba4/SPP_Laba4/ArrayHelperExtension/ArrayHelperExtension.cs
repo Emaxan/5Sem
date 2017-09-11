@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SPP_Laba4
+namespace SPP_Laba4.ArrayHelperExtension
 {
-	public static unsafe class ArrayHelper
+	public static unsafe class ArrayHelperExtension
 	{
-		public static unsafe long Sum(List<int> array)
+		public static unsafe long Sum(this ArrayHelper.ArrayHelper helper, List<int> array)
 		{
 			long sum = 0;
 			var i = 0;

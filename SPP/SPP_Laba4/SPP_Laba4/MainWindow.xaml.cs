@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using SPP_Laba4.ArrayHelperExtension;
 
 namespace SPP_Laba4
 {
@@ -86,7 +86,8 @@ namespace SPP_Laba4
 
 			try
 			{
-				ArrayHelper.Sum(_array);
+                var helper = new ArrayHelper.ArrayHelper();
+			    helper.Sum(_array);
 			}
 			catch (OverflowException ex)
 			{

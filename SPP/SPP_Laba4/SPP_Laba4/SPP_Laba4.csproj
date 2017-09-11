@@ -63,7 +63,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ArrayHelper.cs" />
+    <Compile Include="ArrayHelper\ArrayHelper.cs" />
+    <Compile Include="ArrayHelperExtension\ArrayHelperExtension.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
