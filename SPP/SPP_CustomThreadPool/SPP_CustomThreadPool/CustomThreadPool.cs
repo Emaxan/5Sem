@@ -194,7 +194,7 @@ namespace SPP_CustomThreadPool
 					{
 						taskItem.Handler.Abort();
 					}
-					catch
+					catch(ThreadAbortException)
 					{
 						// ignored
 					}
@@ -310,7 +310,7 @@ namespace SPP_CustomThreadPool
 						{
 							taskItem.Handler.Abort();
 						}
-						catch
+						catch(ThreadAbortException)
 						{
 							// ignored
 						}
