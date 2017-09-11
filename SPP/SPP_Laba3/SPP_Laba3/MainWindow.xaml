@@ -20,8 +20,8 @@
 				<RowDefinition/>
 				<RowDefinition Height="2*"/>
 			</Grid.RowDefinitions>
-			<Button x:Name="BAdd" Grid.Column="0" Grid.Row="0" Content="Add thread" HorizontalAlignment="Stretch" Margin="10" VerticalAlignment="Stretch" Click="BAdd_Click" />
-			<Button x:Name="BRemove" Grid.Column="1" Grid.Row="0" Content="Remove thread" HorizontalAlignment="Stretch" Margin="10" VerticalAlignment="Stretch" Click="BRemove_Click" />
+			<Button Grid.Column="0" Grid.Row="0" Content="Add thread" HorizontalAlignment="Stretch" Margin="10" VerticalAlignment="Stretch" Click="BAdd_Click" />
+			<Button Grid.Column="1" Grid.Row="0" Content="Remove thread" HorizontalAlignment="Stretch" Margin="10" VerticalAlignment="Stretch" Click="BRemove_Click" />
 			<Border Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10" BorderThickness="1" BorderBrush="Black" CornerRadius="10">
 				<Grid>
 					<Grid.ColumnDefinitions>
