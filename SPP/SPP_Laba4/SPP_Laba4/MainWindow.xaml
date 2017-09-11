@@ -1,0 +1,24 @@
+﻿<Window x:Class="SPP_Laba4.MainWindow"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:local="clr-namespace:SPP_Laba4"
+		mc:Ignorable="d"
+		Title="MainWindow" Height="350" Width="525">
+	<Grid>
+		<Grid Grid.Column="0">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="50" />
+				<RowDefinition />
+			</Grid.RowDefinitions>
+			<TextBox x:Name="TbArrayLength" VerticalContentAlignment="Bottom" Margin="0,0,100,0" Grid.Row="0" MaxLength="4" KeyDown="TbArrayLength_OnKeyDown"/>
+			<Button x:Name="BGenerate" Grid.Row="0" Content="Generate" Width="100" Height="25" VerticalAlignment="Top" HorizontalAlignment="Right" Click="BGenerate_OnClick"/>
+			<Button x:Name="BGetSum" Grid.Row="0" Content="Get sum" Width="100" Height="25" VerticalAlignment="Bottom" HorizontalAlignment="Right" Click="BGetSum_Click"/>
+			<Label Grid.Row="0" Content="ArrayLength:" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+			<ScrollViewer Grid.Row="1">
+				<StackPanel x:Name="SpArray" Height="auto"/>
+			</ScrollViewer>
+		</Grid>
+	</Grid>
+</Window>
