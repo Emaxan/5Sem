@@ -4,20 +4,19 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.Win32;
+using SPP_CustomThreadPool;
 
 namespace SPP_Laba5
 {
-	/// <summary>
-	/// Interaction logic for MainWindow.xaml
-	/// </summary>
-	public partial class MainWindow : Window
+	public partial class MainWindow
 	{
 		private Brush _color;
-
+	    private readonly CustomThreadPool _pool;
 
 		public MainWindow()
 		{
 			InitializeComponent();
+            _pool = CustomThreadPool.GetInstance(0, 1000);
 		}
 
 
@@ -60,12 +59,14 @@ namespace SPP_Laba5
 					{
 						CheckFileExists = true,
 						CheckPathExists = true,
-						Multiselect = false,
+						Multiselect = false
 					};
 			if(ofd.ShowDialog() != true)
 			{
 				return;
 			}
+
+		    LSource.Content = ofd.FileNames[0];
 		}
 
 		private void OpenDestination_Click(object sender, RoutedEventArgs e)
@@ -73,11 +74,20 @@ namespace SPP_Laba5
 			var ofd = new OpenFileDialog
 					{
 						Multiselect = false,
-					};
+					    CheckFileExists = false,
+					    CheckPathExists = false
+            };
 			if (ofd.ShowDialog() != true)
 			{
 				return;
 			}
+
+		    LDestination.Content = ofd.FileNames[0];
 		}
+
+	    private void IudThreadCount_OnKeyDown(object sender, KeyEventArgs e)
+	    {
+	        e.Handled = true;
+	    }
 	}
 }
