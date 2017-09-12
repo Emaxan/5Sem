@@ -6,13 +6,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SPP_Laba5"
         mc:Ignorable="d"
-        Title="MainWindow" Height="400" Width="525">
+        Title="MainWindow" Height="425" Width="525" Closing="Window_Closing">
     <Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="50"/>
 			<RowDefinition Height="50"/>
 			<RowDefinition Height="50"/>
 			<RowDefinition/>
+			<RowDefinition Height="20"/>
 		</Grid.RowDefinitions>
 		<Label Grid.Row="0" Content="Source: " Width="90" HorizontalAlignment="Left" VerticalContentAlignment="Center" HorizontalContentAlignment="Right"/>
 		<Label x:Name="LSource" Grid.Row="0" Margin="90,0,120,0" VerticalContentAlignment="Center"/>
@@ -21,7 +22,8 @@
 		<Label x:Name="LDestination" Grid.Row="1" Margin="90,0,120,0" VerticalContentAlignment="Center"/>
 		<Button Grid.Row="1" HorizontalAlignment="Right" Width="100" Margin="10" Content="Open destination" Height="25" Click="OpenDestination_Click"/>
 	    <Label Grid.Row="2" Content="Thread count: " Width="90" HorizontalAlignment="Left" VerticalContentAlignment="Center" HorizontalContentAlignment="Right"/>
-		<xctk:IntegerUpDown x:Name="IudThreadCount"  Grid.Row="2" FormatString="N0" Value="0" Increment="1" Maximum="100" Minimum="0" Margin="90,0,0,0" BorderThickness="0" KeyDown="IudThreadCount_OnKeyDown"/>
+		<xctk:IntegerUpDown x:Name="IudThreadCount" Grid.Row="2" FormatString="N0" Value="1" Increment="1" Maximum="1000" Minimum="1" Margin="90,0,120,0" BorderThickness="0" KeyDown="IudThreadCount_OnKeyDown"/>
+	    <Button x:Name="BSave" Grid.Row="2" HorizontalAlignment="Right" Width="100" Margin="10" Content="Save(only 1 time)" Height="25" Click="SaveThreadsCount_Click"/>
 		<Grid Grid.Row="3">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition/>
@@ -34,5 +36,6 @@
 				<Label VerticalAlignment="Center" HorizontalAlignment="Center" Content="Cancel" Foreground="White" FontSize="50" FontWeight="Bold"></Label>
 			</Border>
 		</Grid>
+		<ProgressBar x:Name="PbProgress" Grid.Row="4"></ProgressBar>
 	</Grid>
 </Window>
