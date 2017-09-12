@@ -1,180 +1,255 @@
-// OSiSP_Laba1.cpp : Defines the entry point for the application.
-//
-
 #include "stdafx.h"
 #include "OSiSP_Laba1.h"
+#include <winuser.h>
+#include <winuser.h>
 
 #define MAX_LOADSTRING 100
 
-// Global Variables:
-HINSTANCE hInst;                                // current instance
-WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
-WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
+HINSTANCE hInst;
+WCHAR szTitle[MAX_LOADSTRING];
+WCHAR szWindowClass[MAX_LOADSTRING];
 
-// Forward declarations of functions included in this code module:
-ATOM                MyRegisterClass(HINSTANCE hInstance);
-BOOL                InitInstance(HINSTANCE, int);
-LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+ATOM MyRegisterClass(HINSTANCE hInstance);
+BOOL InitInstance(HINSTANCE, int);
+LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+							_In_opt_ HINSTANCE hPrevInstance,
+							_In_ LPWSTR lpCmdLine,
+							_In_ int nCmdShow)
 {
-    UNREFERENCED_PARAMETER(hPrevInstance);
-    UNREFERENCED_PARAMETER(lpCmdLine);
+	nCmdShow = 3;
 
-    // TODO: Place code here.
+	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
+	LoadStringW(hInstance, IDC_OSISP_LABA1, szWindowClass, MAX_LOADSTRING);
+	MyRegisterClass(hInstance);
 
-    // Initialize global strings
-    LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-    LoadStringW(hInstance, IDC_OSISP_LABA1, szWindowClass, MAX_LOADSTRING);
-    MyRegisterClass(hInstance);
+	if (!InitInstance(hInstance, nCmdShow))
+	{
+		return FALSE;
+	}
 
-    // Perform application initialization:
-    if (!InitInstance (hInstance, nCmdShow))
-    {
-        return FALSE;
-    }
+	HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_OSISP_LABA1));
 
-    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_OSISP_LABA1));
+	MSG msg;
 
-    MSG msg;
+	while (GetMessage(&msg, nullptr, 0, 0))
+	{
+		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+	}
 
-    // Main message loop:
-    while (GetMessage(&msg, nullptr, 0, 0))
-    {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
-        {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
-    }
-
-    return (int) msg.wParam;
+	return static_cast<int>(msg.wParam);
 }
 
-
-
-//
-//  FUNCTION: MyRegisterClass()
-//
-//  PURPOSE: Registers the window class.
-//
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
-    WNDCLASSEXW wcex;
+	WNDCLASSEXW wcex;
 
-    wcex.cbSize = sizeof(WNDCLASSEX);
+	wcex.cbSize = sizeof(WNDCLASSEX);
 
-    wcex.style          = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc    = WndProc;
-    wcex.cbClsExtra     = 0;
-    wcex.cbWndExtra     = 0;
-    wcex.hInstance      = hInstance;
-    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_OSISP_LABA1));
-    wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_OSISP_LABA1);
-    wcex.lpszClassName  = szWindowClass;
-    wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+	wcex.style = CS_HREDRAW | CS_VREDRAW | CS_NOCLOSE;
+	wcex.lpfnWndProc = WndProc;
+	wcex.cbClsExtra = 0;
+	wcex.cbWndExtra = 0;
+	wcex.hInstance = hInstance;
+	wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_OSISP_LABA1));
+	wcex.hCursor = LoadCursor(nullptr, IDC_CROSS);
+	wcex.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
+	wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_OSISP_LABA1);
+	wcex.lpszClassName = szWindowClass;
+	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
-    return RegisterClassExW(&wcex);
+	return RegisterClassExW(&wcex);
 }
 
-//
-//   FUNCTION: InitInstance(HINSTANCE, int)
-//
-//   PURPOSE: Saves instance handle and creates main window
-//
-//   COMMENTS:
-//
-//        In this function, we save the instance handle in a global variable and
-//        create and display the main program window.
-//
+#pragma region Drawing
+
+enum Ways
+{
+	XY = 0,
+	X = 1,
+	Y = 2
+};
+
+int ellipseCenterX = 100;
+int ellipseCenterY = 50;
+int ellipseRadiusX = 100;
+int ellipseRadiusY = 50;
+int step = 5;
+RECT rcClient, rcWind;
+
+BOOL DrawWindow(HDC hdc)
+{
+	HBITMAP BmpBrush = LoadBitmap(hInst, MAKEINTRESOURCE(IDB_BITMAP1));
+	HBRUSH brPattern = CreatePatternBrush(BmpBrush);
+	SelectObject(hdc, brPattern);
+	SelectObject(hdc, GetStockObject(DC_PEN));
+	SetDCBrushColor(hdc, RGB(255, 0, 0));
+	SetDCPenColor(hdc, RGB(255, 0, 0));
+
+	int top = ellipseCenterY - ellipseRadiusY;
+	int left = ellipseCenterX - ellipseRadiusX;
+	int right = ellipseCenterX + ellipseRadiusX;
+	int bottom = ellipseCenterY + ellipseRadiusY;
+	Ellipse(hdc, left, top, right, bottom);
+
+	return TRUE;
+}
+
+void ValidateCoords(int ways = 0)
+{
+	if(ways & Y || ways == XY)
+	{
+		while (ellipseCenterY - ellipseRadiusY < 0)
+		{
+			ellipseCenterY += 5 * step;
+		}
+		while (ellipseCenterY + ellipseRadiusY > rcClient.bottom)
+		{
+			ellipseCenterY -= 5 * step;
+		}
+	}
+	
+	if(ways & X || ways == XY)
+	{
+		while (ellipseCenterX + ellipseRadiusX > rcClient.right)
+		{
+			ellipseCenterX -= 5 * step;
+		}
+		while (ellipseCenterX - ellipseRadiusX < 0)
+		{
+			ellipseCenterX += 5 * step;
+		}
+	}	
+}
+
+#pragma endregion
+
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   hInst = hInstance; // Store instance handle in our global variable
+	hInst = hInstance;
 
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+	HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_POPUP,
+		CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
 
-   if (!hWnd)
-   {
-      return FALSE;
-   }
+	if (!hWnd)
+	{
+		return FALSE;
+	}
 
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
+	ShowWindow(hWnd, nCmdShow);
+	UpdateWindow(hWnd);
 
-   return TRUE;
+	GetClientRect(hWnd, &rcClient);
+	GetWindowRect(hWnd, &rcWind);
+
+	return TRUE;
 }
 
-//
-//  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
-//
-//  PURPOSE:  Processes messages for the main window.
-//
-//  WM_COMMAND  - process the application menu
-//  WM_PAINT    - Paint the main window
-//  WM_DESTROY  - post a quit message and return
-//
-//
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    switch (message)
-    {
-    case WM_COMMAND:
-        {
-            int wmId = LOWORD(wParam);
-            // Parse the menu selections:
-            switch (wmId)
-            {
-            case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-                break;
-            case IDM_EXIT:
-                DestroyWindow(hWnd);
-                break;
-            default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
-            }
-        }
-        break;
-    case WM_PAINT:
-        {
-            PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
-            // TODO: Add any drawing code that uses hdc here...
-            EndPaint(hWnd, &ps);
-        }
-        break;
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        break;
-    default:
-        return DefWindowProc(hWnd, message, wParam, lParam);
-    }
-    return 0;
+	switch (message)
+	{
+	case WM_COMMAND:
+		{
+			int wmId = LOWORD(wParam);
+			switch (wmId)
+			{
+			case IDM_ABOUT:
+				DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+				break;
+			case IDM_EXIT:
+				DestroyWindow(hWnd);
+				break;
+			default:
+				return DefWindowProc(hWnd, message, wParam, lParam);
+			}
+		}
+		break;
+	case WM_KEYDOWN:
+		{
+			switch (wParam)
+			{
+			case VK_UP:
+				ellipseCenterY -= step;
+				ValidateCoords(Y);
+				break;
+			case VK_DOWN:
+				ellipseCenterY += step;
+				ValidateCoords(Y);
+				break;
+			case VK_RIGHT:
+				ellipseCenterX += step;
+				ValidateCoords(X);
+				break;
+			case VK_LEFT:
+				ellipseCenterX -= step;
+				ValidateCoords(X);
+				break;
+			default:
+				return DefWindowProc(hWnd, message, wParam, lParam);
+			}
+			InvalidateRect(hWnd, nullptr, TRUE);
+		}
+		break;
+	case WM_MOUSEMOVE:
+		ellipseCenterY = GET_Y_LPARAM(lParam);
+		ellipseCenterX = GET_X_LPARAM(lParam);
+		ValidateCoords();
+		InvalidateRect(hWnd, nullptr, TRUE);
+		break;
+	case WM_MOUSEWHEEL:
+		if (GET_KEYSTATE_WPARAM(wParam) == MK_SHIFT)
+		{
+			short dy = GET_WHEEL_DELTA_WPARAM(wParam);
+			ellipseCenterY += dy < 0 ? -5*step : 5*step;
+		}
+		else
+		{
+			short dx = GET_WHEEL_DELTA_WPARAM(wParam);
+			ellipseCenterX += dx < 0 ? -5*step : 5*step;
+		}
+		InvalidateRect(hWnd, nullptr, TRUE);
+		break;
+	case WM_PAINT:
+		{
+			PAINTSTRUCT ps;
+			HDC hdc = BeginPaint(hWnd, &ps);
+			DrawWindow(hdc);
+			EndPaint(hWnd, &ps);
+		}
+		break;
+	case WM_DESTROY:
+		{
+			PostQuitMessage(0); 
+		}
+		break;
+	default:
+		return DefWindowProc(hWnd, message, wParam, lParam);
+	}
+	return 0;
 }
 
-// Message handler for about box.
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    UNREFERENCED_PARAMETER(lParam);
-    switch (message)
-    {
-    case WM_INITDIALOG:
-        return (INT_PTR)TRUE;
+	int wmId = LOWORD(wParam);
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		return static_cast<INT_PTR>(TRUE);
 
-    case WM_COMMAND:
-        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-        {
-            EndDialog(hDlg, LOWORD(wParam));
-            return (INT_PTR)TRUE;
-        }
-        break;
-    }
-    return (INT_PTR)FALSE;
+	case WM_COMMAND:
+		if (wmId == IDOK || wmId == IDCANCEL)
+		{
+			EndDialog(hDlg, LOWORD(wParam));
+			return static_cast<INT_PTR>(TRUE);
+		}
+		break;
+	}
+	return static_cast<INT_PTR>(FALSE);
 }

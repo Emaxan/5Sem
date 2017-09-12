@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -49,6 +46,12 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="OSiSP_Laba1.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="bitmap1.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="img-thing.jpg">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

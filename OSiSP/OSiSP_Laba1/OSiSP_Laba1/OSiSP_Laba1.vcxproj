@@ -138,9 +138,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="OSiSP_Laba1.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -159,6 +156,8 @@
     <ResourceCompile Include="OSiSP_Laba1.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="bitmap1.bmp" />
+    <Image Include="img-thing.jpg" />
     <Image Include="OSiSP_Laba1.ico" />
     <Image Include="small.ico" />
   </ItemGroup>
