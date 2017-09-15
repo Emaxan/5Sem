@@ -15,6 +15,8 @@ namespace SPP_CustomThreadPool
 		private Queue<TaskHandle> _readyQueue;
 		private Thread _taskScheduler;
 
+	    public static bool Suspend = false;
+
 		private void InitializeThreadPool()
 		{
 			_readyQueue = new Queue<TaskHandle>();
@@ -29,6 +31,9 @@ namespace SPP_CustomThreadPool
 									{
 										do
 										{
+										    while(Suspend)
+										    {
+										    }
 											lock(_syncLock)
 											{
 												while(_readyQueue.Count > 0 && _readyQueue.Peek().Task == null)
@@ -53,6 +58,7 @@ namespace SPP_CustomThreadPool
 																}
 																ti.TaskHandle = readyItem;
 																ti.TaskState = TaskState.NotStarted;
+															    ti.TaskHandle.Token.State = ti.TaskState;
 																added = true;
 																_readyQueue.Dequeue();
 																break;
@@ -66,7 +72,8 @@ namespace SPP_CustomThreadPool
 																		TaskState = TaskState.NotStarted,
 																		TaskHandle = readyItem
 																	};
-															AddTaskToPool(ti);
+														    ti.TaskHandle.Token.State = ti.TaskState;
+                                                            AddTaskToPool(ti);
 															added = true;
 															_readyQueue.Dequeue();
 														}
@@ -123,7 +130,8 @@ namespace SPP_CustomThreadPool
 							if(taskItem.TaskState == TaskState.NotStarted)
 							{
 								taskItem.TaskState = TaskState.Processing;
-								taskItem.StartTime = DateTime.Now;
+							    taskItem.TaskHandle.Token.State = taskItem.TaskState;
+                                taskItem.StartTime = DateTime.Now;
 								enter = true;
 							}
 						}
@@ -150,7 +158,8 @@ namespace SPP_CustomThreadPool
 									try
 									{
 										taskItem.TaskState = TaskState.Completed;
-										taskItem.StartTime = DateTime.MaxValue;
+									    taskItem.TaskHandle.Token.State = taskItem.TaskState;
+                                        taskItem.StartTime = DateTime.MaxValue;
 
 										taskItem.TaskHandle.Callback(taskStatus);
 									}
@@ -208,7 +217,8 @@ namespace SPP_CustomThreadPool
 					{
 						taskItem.Handler.Priority = ThreadPriority.AboveNormal;
 						taskItem.TaskState = TaskState.Aborted;
-						_pool.Remove(taskItem);
+					    taskItem.TaskHandle.Token.State = taskItem.TaskState;
+                        _pool.Remove(taskItem);
 						total--;
 						if(total == _min)
 							break;
@@ -235,7 +245,8 @@ namespace SPP_CustomThreadPool
 												}
 									}
 					};
-			ti.TaskHandle.Callback = taskStatus =>
+		    ti.TaskHandle.Token.State = ti.TaskState;
+            ti.TaskHandle.Callback = taskStatus =>
 									{
 									};
 			AddTaskToPool(ti);
@@ -261,7 +272,8 @@ namespace SPP_CustomThreadPool
 						Task = task,
 						Token = new ClientHandle
 								{
-									Id = Guid.NewGuid()
+									Id = Guid.NewGuid(),
+                                    State = TaskState.NotStarted
 								},
 						Callback = callback
 					};
@@ -277,7 +289,7 @@ namespace SPP_CustomThreadPool
 		{
 			lock(GetInstance()._syncLock)
 			{
-				var thandle = GetInstance()._readyQueue.FirstOrDefault(th => th.Token.Id == clientToken.Id);
+				var thandle = GetInstance()._readyQueue.FirstOrDefault(th => th.Token?.Id == clientToken.Id);
 				if(thandle != null)
 				{
 					thandle.Task = null;
@@ -300,7 +312,8 @@ namespace SPP_CustomThreadPool
 						if(taskItem.TaskState != TaskState.Completed)
 						{
 							taskItem.TaskState = TaskState.Aborted;
-							taskItem.TaskHandle.Callback = null;
+						    taskItem.TaskHandle.Token.State = taskItem.TaskState;
+                            taskItem.TaskHandle.Callback = null;
 						}
 						if(taskItem.TaskState != TaskState.Aborted)
 						{
@@ -372,7 +385,8 @@ namespace SPP_CustomThreadPool
 				foreach(var item in _pool)
 				{
 					item.TaskState = TaskState.Aborted;
-					item.Handler.Abort();
+				    item.TaskHandle.Token.State = item.TaskState;
+                    item.Handler.Abort();
 				}
 				_pool.Clear();
 			}

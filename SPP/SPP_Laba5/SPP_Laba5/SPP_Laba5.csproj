@@ -34,7 +34,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="SPP_CustomThreadPool">
+    <Reference Include="SPP_CustomThreadPool, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SPP_CustomThreadPool\SPP_CustomThreadPool\bin\Release\SPP_CustomThreadPool.dll</HintPath>
     </Reference>
     <Reference Include="System" />

@@ -6,5 +6,6 @@ namespace SPP_CustomThreadPool
 	{
 		public Guid Id;
 		public bool IsSimpleTask = false;
+	    public TaskState State;
 	}
 }

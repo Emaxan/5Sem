@@ -1,193 +1,214 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.Win32;
 using SPP_CustomThreadPool;
-using System.IO;
 
 namespace SPP_Laba5
 {
-	public partial class MainWindow
-	{
-		private Brush _color;
-	    private CustomThreadPool _pool;
-	    private int _complete;
-
-	    private const int Step = 1024*1024;
+    public partial class MainWindow
+    {
+        private const int Step = 1024 * 1024;
+        private readonly List<ClientHandle> _currentTask = new List<ClientHandle>();
+        private Brush _color;
+        private CustomThreadPool _pool;
+        private int _complete;
+        private FileInfo _destFile;
 
 
         public MainWindow()
-		{
-			InitializeComponent();
-		}
+        {
+            InitializeComponent();
+        }
 
 
-		private void CopyClick(object sender, MouseButtonEventArgs e)
-		{
-		    if(_pool == null)
-		    {
-		        MessageBox.Show("You should enter and save value of thread count first.");
+        private void CopyClick(object sender, MouseButtonEventArgs e)
+        {
+            if(_pool == null)
+            {
+                MessageBox.Show("You should enter and save value of thread count first.");
                 return;
-		    }
+            }
 
-            if (LSource.Content == null)
+            if(LSource.Content == null)
             {
                 MessageBox.Show("You should choose source file first.");
                 return;
-		    }
+            }
 
-		    if(LDestination.Content == null)
-		    {
-		        MessageBox.Show("You should choose destination file first.");
+            if(LDestination.Content == null)
+            {
+                MessageBox.Show("You should choose destination file first.");
                 return;
-		    }
+            }
 
-		    _complete = 0;
+            _complete = 0;
             var source = LSource.Content;
-		    var destination = LDestination.Content;
-		    var sourceFile = new FileInfo(source.ToString());
-            var destFile = new FileInfo(destination.ToString());
-		    if(destFile.Exists)
-		    {
-		        destFile.Delete();
-		    }
-            var file = destFile.Create();
+            var destination = LDestination.Content;
+            var sourceFile = new FileInfo(source.ToString());
+            _destFile = new FileInfo(destination.ToString());
+            if(_destFile.Exists)
+            {
+                _destFile.Delete();
+            }
+            var file = _destFile.Create();
             file.Dispose();
             PbProgress.Maximum = sourceFile.Length;
-		    var i = 0L;
-		    while(i < sourceFile.Length)
-		    {
-		        var i1 = i;
-		        _pool.QueueUserTask(() =>
-		                            {
-		                                lock(destFile)
-		                                {
-		                                    using(var outStream =
-		                                        new FileStream(destFile.FullName, FileMode.Open, FileAccess.Write))
-		                                    {
-		                                        using(var inStream = sourceFile.OpenRead())
-		                                        {
-		                                            var start = i1;
-		                                            inStream.Seek(start, SeekOrigin.Begin);
-		                                            outStream.Seek(start, SeekOrigin.Begin);
-		                                            var lenght = start + Step <= sourceFile.Length
-		                                                             ? Step
-		                                                             : sourceFile.Length - start;
-		                                            for(var j = 0; j < lenght; j++)
-		                                            {
-		                                                var buf = (byte)inStream.ReadByte();
-		                                                outStream.WriteByte(buf);
-                                                        
-		                                            }
-		                                        }
-		                                    }
-		                                }
+            var i = 0L;
+            while(i < sourceFile.Length)
+            {
+                var i1 = i;
 
-		                                return true;
-		                            },
-		                            ts =>
-		                            {
-		                                if(ts.Success)
-		                                {
-		                                    lock(this)
-		                                    {
-		                                        _complete += Step;
-		                                        Dispatcher.Invoke(() =>
-		                                                          {
-		                                                              PbProgress.Value = _complete;
-		                                                          });
-		                                    }
-		                                }
-		                                else
-		                                {
-		                                    MessageBox.Show(ts.InnerException.Message);
-		                                }
-		                            });
-		        i += Step;
-		    }
-		}
+                _currentTask.Add(_pool.QueueUserTask(() => Task(sourceFile, _destFile, i1), Callback));
+                i += Step;
+            }
+        }
 
-	    private void StopClick(object sender, MouseButtonEventArgs e)
-		{
+        private void Callback(TaskStatus ts)
+        {
+            if(ts.Success)
+            {
+                lock(this)
+                {
+                    _complete += Step;
+                    Dispatcher.Invoke(() =>
+                                      {
+                                          PbProgress.Value = _complete;
+                                      });
+                }
+            }
+            else
+            {
+                MessageBox.Show(ts.InnerException.Message);
+            }
+        }
 
-		}
+        private bool Task(FileInfo sourceFile, FileInfo destFile, long startPos)
+        {
+            lock(destFile)
+            {
+                using(var outStream = destFile.OpenWrite())
+                {
+                    using(var inStream = sourceFile.OpenRead())
+                    {
+                        var start = startPos;
+                        inStream.Seek(start, SeekOrigin.Begin);
+                        outStream.Seek(start, SeekOrigin.Begin);
+                        var lenght = start + Step <= sourceFile.Length
+                                         ? Step
+                                         : sourceFile.Length - start;
+                        for(var j = 0; j < lenght; j++)
+                        {
+                            var buf = (byte)inStream.ReadByte();
+                            outStream.WriteByte(buf);
+                        }
+                    }
+                }
+            }
 
-		private void Border_MouseEnter(object sender, MouseEventArgs e)
-		{
-			var border = sender as Border;
-			if(border == null)
-			{
-				return;
-			}
+            return true;
+        }
 
-			_color = border.BorderBrush;
-			border.BorderBrush = new SolidColorBrush(Colors.Black);
-		}
+        private void StopClick(object sender, MouseButtonEventArgs e)
+        {
+            CustomThreadPool.Suspend = true;
+            for(var i = _complete / Step + 1; i < _currentTask.Count; i++)
+            {
+                if(_currentTask[i].State != TaskState.NotStarted)
+                {
+                    continue;
+                }
+                CustomThreadPool.CancelUserTask(_currentTask[i]);
+            }
+            CustomThreadPool.Suspend = false;
+            var file = new FileInfo(LDestination.Content.ToString());
+            lock(_destFile)
+            {
+                file.Delete();
+            }
+            PbProgress.Value = PbProgress.Maximum;
+        }
 
-		private void Border_MouseLeave(object sender, MouseEventArgs e)
-		{
-			var border = sender as Border;
-			if (border == null)
-			{
-				return;
-			}
+        private void Border_MouseEnter(object sender, MouseEventArgs e)
+        {
+            var border = sender as Border;
+            if(border == null)
+            {
+                return;
+            }
 
-			border.BorderBrush = _color;
-		}
+            _color = border.BorderBrush;
+            border.BorderBrush = new SolidColorBrush(Colors.Black);
+        }
 
-		private void OpenSource_Click(object sender, RoutedEventArgs e)
-		{
-			var ofd = new OpenFileDialog
-					{
-						CheckFileExists = true,
-						CheckPathExists = true,
-						Multiselect = false
-					};
-			if(ofd.ShowDialog() != true)
-			{
-				return;
-			}
+        private void Border_MouseLeave(object sender, MouseEventArgs e)
+        {
+            var border = sender as Border;
+            if(border == null)
+            {
+                return;
+            }
 
-		    LSource.Content = ofd.FileNames[0];
-		}
+            border.BorderBrush = _color;
+        }
 
-		private void OpenDestination_Click(object sender, RoutedEventArgs e)
-		{
-			var ofd = new OpenFileDialog
-					{
-						Multiselect = false,
-					    CheckFileExists = false,
-					    CheckPathExists = false
-            };
-			if (ofd.ShowDialog() != true)
-			{
-				return;
-			}
+        private void OpenSource_Click(object sender, RoutedEventArgs e)
+        {
+            var ofd = new OpenFileDialog
+                      {
+                          CheckFileExists = true,
+                          CheckPathExists = true,
+                          Multiselect = false
+                      };
+            if(ofd.ShowDialog() != true)
+            {
+                return;
+            }
 
-		    LDestination.Content = ofd.FileNames[0];
-		}
+            LSource.Content = ofd.FileNames[0];
+        }
 
-	    private void IudThreadCount_OnKeyDown(object sender, KeyEventArgs e)
-	    {
-	        e.Handled = true;
-	    }
+        private void OpenDestination_Click(object sender, RoutedEventArgs e)
+        {
+            var ofd = new OpenFileDialog
+                      {
+                          Multiselect = false,
+                          CheckFileExists = false,
+                          CheckPathExists = false
+                      };
+            if(ofd.ShowDialog() != true)
+            {
+                return;
+            }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+            LDestination.Content = ofd.FileNames[0];
+        }
+
+        private void IudThreadCount_OnKeyDown(object sender, KeyEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void Window_Closing(object sender, CancelEventArgs e)
         {
             _pool?.Dispose();
         }
 
-	    private void SaveThreadsCount_Click(object sender, RoutedEventArgs e)
-	    {
-	        if(!IudThreadCount.Value.HasValue)
-	        {
-	            return;
-	        }
+        private void SaveThreadsCount_Click(object sender, RoutedEventArgs e)
+        {
+            if(!IudThreadCount.Value.HasValue)
+            {
+                return;
+            }
 
-	        BSave.IsEnabled = false;
-	        IudThreadCount.IsReadOnly = true;
-	        _pool = CustomThreadPool.GetInstance(IudThreadCount.Value.Value, IudThreadCount.Value.Value);
+            BSave.IsEnabled = false;
+            IudThreadCount.IsReadOnly = true;
+            _pool = CustomThreadPool.GetInstance(IudThreadCount.Value.Value, IudThreadCount.Value.Value);
         }
-	}
+    }
 }
