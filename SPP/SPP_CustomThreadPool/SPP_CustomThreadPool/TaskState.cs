@@ -1,6 +1,6 @@
 namespace SPP_CustomThreadPool
 {
-	internal enum TaskState
+	public enum TaskState
 	{
 		NotStarted,
 		Processing,
