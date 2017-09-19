@@ -7,9 +7,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SPP_Laba5"
         mc:Ignorable="d"
-        Title="MainWindow" Height="425" Width="525" Closing="Window_Closing">
+        Title="MainWindow" Height="460" Width="525" Closing="Window_Closing">
     <Grid>
 		<Grid.RowDefinitions>
+			<RowDefinition Height="50"/>
 			<RowDefinition Height="50"/>
 			<RowDefinition Height="50"/>
 			<RowDefinition Height="50"/>
@@ -25,7 +26,8 @@
 	    <Label Grid.Row="2" Content="Thread count: " Width="90" HorizontalAlignment="Left" VerticalContentAlignment="Center" HorizontalContentAlignment="Right"/>
 		<xctk:IntegerUpDown x:Name="IudThreadCount" Grid.Row="2" FormatString="N0" Value="1" Increment="1" Maximum="1000" Minimum="1" Margin="90,0,120,0" BorderThickness="0" KeyDown="IudThreadCount_OnKeyDown"/>
 	    <Button x:Name="BSave" Grid.Row="2" HorizontalAlignment="Right" Width="100" Margin="10" Content="Save(only 1 time)" Height="25" Click="SaveThreadsCount_Click"/>
-		<Grid Grid.Row="3">
+		<Button x:Name="BCheck" Grid.Row="3" Margin="200,10" Content="Check md5" Click="BCheck_OnClick"/>
+		<Grid Grid.Row="4">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition/>
 				<ColumnDefinition/>
@@ -37,6 +39,6 @@
 				<Label VerticalAlignment="Center" HorizontalAlignment="Center" Content="Cancel" Foreground="White" FontSize="50" FontWeight="Bold"></Label>
 			</Border>
 		</Grid>
-		<ProgressBar x:Name="PbProgress" Grid.Row="4"></ProgressBar>
+		<ProgressBar x:Name="PbProgress" Grid.Row="5"></ProgressBar>
 	</Grid>
 </Window>
