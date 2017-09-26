@@ -2,11 +2,21 @@
 #include "OSiSP_Laba2.h"
 #include <winuser.h>
 
+
 #define MAX_LOADSTRING 100
+#define MAX_STRING_LENGTH 1024
+#define STRING_COUNT 5
 
 HINSTANCE hInst;
 WCHAR szTitle[MAX_LOADSTRING];
 WCHAR szWindowClass[MAX_LOADSTRING];
+TCHAR *szContent[STRING_COUNT] = {
+	L"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.",
+	L"Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.",
+	L"Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus.",
+	L"Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus.",
+	L"Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc."
+};
 
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
@@ -93,8 +103,51 @@ RECT rcClient;
 
 BOOL DrawLine(HDC hdc, int x0, int y0, int x, int y)
 {
-	MoveToEx(hdc, x0, y0, NULL);
+	MoveToEx(hdc, x0, y0, nullptr);
 	return LineTo(hdc, x, y);
+}
+
+TCHAR *BreakString(TCHAR* str, int max_letters_count)
+{
+	int len = _tcslen(str);
+	TCHAR enter = L'\n';
+	TCHAR result[1024] = L"";
+	int i = 0;
+	int j = 0;
+	while (i < len)
+	{
+		TCHAR c = str[i];
+		result[j] = c;
+		if(i%max_letters_count==0 && i!=0)
+		{
+			result[++j] = L'\\';
+			result[++j] = L'n';
+		}
+		i++; 
+		j++;
+	}
+	return result;
+}
+
+int DrawRow(HDC hdc, int columnsWidth, int columnsCount)
+{
+	SIZE size;
+	int strlength = _tcslen(szContent[4]);
+	GetTextExtentPoint(hdc ,szContent[4], strlength, &size);
+
+	auto rect = new RECT();
+	rect->bottom = 0;
+	rect->left = 0;
+	rect->top = 0;
+	rect->right = columnsWidth;
+
+	int rowsHeight = DrawText(hdc, szContent[4], _tcslen(szContent[4]), rect, DT_CALCRECT | DT_WORDBREAK);
+
+	rect->bottom = rowsHeight;
+
+	DrawText(hdc, szContent[4], _tcslen(szContent[4]), rect, DT_WORDBREAK);
+
+	return rowsHeight;
 }
 
 void DrawWindow(HWND hWnd, HDC hdc)
@@ -106,24 +159,18 @@ void DrawWindow(HWND hWnd, HDC hdc)
 	SelectObject(hdc, GetStockObject(DC_PEN));
 	SetDCPenColor(hdc, RGB(0, 0, 0));
 	GetClientRect(hWnd, &rcClient);
-	int height = rcClient.bottom;
 	int width = rcClient.right;
 
-	if (height < 10 * rowsCount) 
-	{
-		return;
-	}
-
-	int rowsHeight = height / rowsCount;
 	int columnsWidth = width / columnsCount;
-	
-	for (int i = 0; i <= rowsCount; i++) {
-		DrawLine(hdc, 0, i*rowsHeight, columnsCount*columnsWidth, i*rowsHeight);
-	}
-	for (int i = 0; i <= columnsCount; i++) {
-		DrawLine(hdc, i*columnsWidth, 0, i*columnsWidth, rowsCount*rowsHeight);
-	}
 
+	int rowHeight = DrawRow(hdc, columnsWidth, columnsCount);
+	
+	/*for (auto i = 0; i <= rowsCount; i++) {
+		DrawLine(hdc, 0, i*rowsHeight, columnsCount*columnsWidth, i*rowsHeight);
+	}*/
+	/*for (auto i = 0; i <= columnsCount; i++) {
+		DrawLine(hdc, i*columnsWidth, 0, i*columnsWidth, rowsCount*rowsHeight);
+	}*/
 }
 
 #pragma endregion 
@@ -181,6 +228,7 @@ INT_PTR CALLBACK ChangeGridSize(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 		{
 		case IDOK:
 		{
+			SetDlgItemText(hDlg, IDC_ERROR_MESSAGE, L"");
 			TCHAR rows[3];
 			TCHAR cols[3];
 
@@ -188,7 +236,12 @@ INT_PTR CALLBACK ChangeGridSize(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 			GetDlgItemText(hDlg, IDC_COLS, cols, sizeof cols);
 			
 			rowsCount = _ttoi(rows);
-			columnsCount = _ttoi(cols); // TODO Validate numbers <= 10
+			columnsCount = _ttoi(cols);
+			if(rowsCount == 0 || columnsCount == 0 || rowsCount > 10 || columnsCount > 10)
+			{
+				SetDlgItemText(hDlg, IDC_ERROR_MESSAGE, L"Wrong numbers.\nPlease enter 1<=x<=10.");
+				return static_cast<INT_PTR>(FALSE);
+			}
 			HWND hWnd = GetParent(hDlg);
 			SendMessage(hWnd, WM_PAINT, 0, 0);
 		}
