@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "OSiSP_Laba2.h"
 #include <winuser.h>
-#include <winuser.h>
 
 #define MAX_LOADSTRING 100
 
@@ -88,12 +87,43 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 #pragma region Drawing
 
-int rows = 0;
-int columns = 0;
+int rowsCount = 0;
+int columnsCount = 0;
+RECT rcClient;
 
-void DrawWindow(HDC hdc)
+BOOL DrawLine(HDC hdc, int x0, int y0, int x, int y)
 {
+	MoveToEx(hdc, x0, y0, NULL);
+	return LineTo(hdc, x, y);
+}
+
+void DrawWindow(HWND hWnd, HDC hdc)
+{
+	if (rowsCount == 0 || columnsCount == 0) 
+	{
+		return;
+	}
+	SelectObject(hdc, GetStockObject(DC_PEN));
+	SetDCPenColor(hdc, RGB(0, 0, 0));
+	GetClientRect(hWnd, &rcClient);
+	int height = rcClient.bottom;
+	int width = rcClient.right;
+
+	if (height < 10 * rowsCount) 
+	{
+		return;
+	}
+
+	int rowsHeight = height / rowsCount;
+	int columnsWidth = width / columnsCount;
 	
+	for (int i = 0; i <= rowsCount; i++) {
+		DrawLine(hdc, 0, i*rowsHeight, columnsCount*columnsWidth, i*rowsHeight);
+	}
+	for (int i = 0; i <= columnsCount; i++) {
+		DrawLine(hdc, i*columnsWidth, 0, i*columnsWidth, rowsCount*rowsHeight);
+	}
+
 }
 
 #pragma endregion 
@@ -123,9 +153,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_PAINT:
         {
+			InvalidateRect(hWnd, nullptr, TRUE);
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
-			DrawWindow(hdc);
+			DrawWindow(hWnd, hdc);
             EndPaint(hWnd, &ps);
         }
         break;
@@ -136,11 +167,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
     return 0;
-}
-
-bool CheckSizes()
-{
-	return false;
 }
 
 INT_PTR CALLBACK ChangeGridSize(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
@@ -157,12 +183,14 @@ INT_PTR CALLBACK ChangeGridSize(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 		{
 			TCHAR rows[3];
 			TCHAR cols[3];
+
 			GetDlgItemText(hDlg, IDC_ROWS, rows, sizeof rows);
 			GetDlgItemText(hDlg, IDC_COLS, cols, sizeof cols);
-			if (CheckSizes())
-			{
-
-			}
+			
+			rowsCount = _ttoi(rows);
+			columnsCount = _ttoi(cols); // TODO Validate numbers <= 10
+			HWND hWnd = GetParent(hDlg);
+			SendMessage(hWnd, WM_PAINT, 0, 0);
 		}
 		case IDCANCEL:
 			EndDialog(hDlg, LOWORD(wParam));
