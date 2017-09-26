@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "OSiSP_Laba2.h"
+#include <winuser.h>
+#include <winuser.h>
 
 #define MAX_LOADSTRING 100
 
@@ -11,17 +13,13 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK    ChangeGridSize(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
-    UNREFERENCED_PARAMETER(hPrevInstance);
-    UNREFERENCED_PARAMETER(lpCmdLine);
-
-    // TODO: Place code here.
-
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDC_OSISP_LABA2, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
@@ -74,7 +72,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance;
 
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_DLGFRAME,
+   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_SIZEBOX | WS_SYSMENU,
       CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
@@ -87,6 +85,18 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    return TRUE;
 }
+
+#pragma region Drawing
+
+int rows = 0;
+int columns = 0;
+
+void DrawWindow(HDC hdc)
+{
+	
+}
+
+#pragma endregion 
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -103,6 +113,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             case IDM_EXIT:
                 DestroyWindow(hWnd);
                 break;
+			case IDM_CHANGEGRIDSIZE:
+				DialogBox(hInst, MAKEINTRESOURCE(IDD_CHANGE_GRID_SIZE), hWnd, ChangeGridSize);
+				break;
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
             }
@@ -112,7 +125,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
-			
+			DrawWindow(hdc);
             EndPaint(hWnd, &ps);
         }
         break;
@@ -125,23 +138,65 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
+bool CheckSizes()
+{
+	return false;
+}
+
+INT_PTR CALLBACK ChangeGridSize(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		return static_cast<INT_PTR>(TRUE);
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case IDOK:
+		{
+			TCHAR rows[3];
+			TCHAR cols[3];
+			GetDlgItemText(hDlg, IDC_ROWS, rows, sizeof rows);
+			GetDlgItemText(hDlg, IDC_COLS, cols, sizeof cols);
+			if (CheckSizes())
+			{
+
+			}
+		}
+		case IDCANCEL:
+			EndDialog(hDlg, LOWORD(wParam));
+			return static_cast<INT_PTR>(TRUE);
+
+		default: 
+			return static_cast<INT_PTR>(FALSE);
+		}
+
+	default: 
+		return static_cast<INT_PTR>(FALSE);
+	}
+}
+
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    UNREFERENCED_PARAMETER(lParam);
     switch (message)
     {
     case WM_INITDIALOG:
         return static_cast<INT_PTR>(TRUE);
 
     case WM_COMMAND:
-        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-        {
-            EndDialog(hDlg, LOWORD(wParam));
-            return static_cast<INT_PTR>(TRUE);
-        }
-        break;
-    default: 
-    	return DefWindowProc(hDlg, message, wParam, lParam);
+		switch (LOWORD(wParam))
+		{
+		case IDOK:
+		case IDCANCEL:
+			EndDialog(hDlg, LOWORD(wParam));
+			return static_cast<INT_PTR>(TRUE);
+
+		default:
+			return static_cast<INT_PTR>(FALSE);
+		}
+
+	default: 
+    	return static_cast<INT_PTR>(FALSE);
     }
-    return static_cast<INT_PTR>(FALSE);
 }
