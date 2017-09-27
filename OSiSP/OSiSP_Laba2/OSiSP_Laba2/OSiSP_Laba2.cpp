@@ -57,8 +57,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     return static_cast<int>(msg.wParam);
 }
 
-
-
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
     WNDCLASSEXW wcex;
@@ -84,7 +82,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance;
 
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_SIZEBOX | WS_SYSMENU,
+   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_SIZEBOX | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX,
       CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
@@ -94,7 +92,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
-
+   DialogBox(hInst, MAKEINTRESOURCE(IDD_CHANGE_GRID_SIZE), hWnd, ChangeGridSize);
    return TRUE;
 }
 
