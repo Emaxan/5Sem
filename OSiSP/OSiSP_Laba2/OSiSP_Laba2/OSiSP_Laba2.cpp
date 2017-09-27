@@ -6,10 +6,13 @@
 #define MAX_LOADSTRING 100
 #define MAX_STRING_LENGTH 1024
 #define STRING_COUNT 5
+#define MAX_NUMBER 10
 
 HINSTANCE hInst;
 WCHAR szTitle[MAX_LOADSTRING];
 WCHAR szWindowClass[MAX_LOADSTRING];
+BOOL changeSize;
+int rands[10][10];
 TCHAR *szContent[STRING_COUNT] = {
 	L"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.",
 	L"Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.",
@@ -107,47 +110,37 @@ BOOL DrawLine(HDC hdc, int x0, int y0, int x, int y)
 	return LineTo(hdc, x, y);
 }
 
-TCHAR *BreakString(TCHAR* str, int max_letters_count)
+int DrawRow(HDC hdc, int columnsWidth, int columnsCount, int yStart, int rowNumber)
 {
-	int len = _tcslen(str);
-	TCHAR enter = L'\n';
-	TCHAR result[1024] = L"";
-	int i = 0;
-	int j = 0;
-	while (i < len)
-	{
-		TCHAR c = str[i];
-		result[j] = c;
-		if(i%max_letters_count==0 && i!=0)
-		{
-			result[++j] = L'\\';
-			result[++j] = L'n';
-		}
-		i++; 
-		j++;
-	}
-	return result;
-}
-
-int DrawRow(HDC hdc, int columnsWidth, int columnsCount)
-{
-	SIZE size;
-	int strlength = _tcslen(szContent[4]);
-	GetTextExtentPoint(hdc ,szContent[4], strlength, &size);
-
 	auto rect = new RECT();
 	rect->bottom = 0;
 	rect->left = 0;
-	rect->top = 0;
+	rect->top = yStart;
 	rect->right = columnsWidth;
+	int height = 0;
+	for (int i = 0; i < columnsCount; i++) 
+	{
+		if (changeSize)
+		{
+			rands[rowNumber][i] = rand() % STRING_COUNT;
+		}
+		int h = DrawText(hdc, szContent[rands[rowNumber][i]], _tcslen(szContent[rands[rowNumber][i]]), rect, DT_CALCRECT | DT_WORDBREAK);
+		if (height < h)
+		{
+			height = h;
+		}
+	}
+	
+	rect->bottom = height + yStart;
 
-	int rowsHeight = DrawText(hdc, szContent[4], _tcslen(szContent[4]), rect, DT_CALCRECT | DT_WORDBREAK);
+	for (int i = 0; i < columnsCount; i++) 
+	{
+		rect->left = i*columnsWidth;
+		rect->right = (i+1)*columnsWidth;
+		DrawText(hdc, szContent[rands[rowNumber][i]], _tcslen(szContent[rands[rowNumber][i]]), rect, DT_WORDBREAK);
+	}
 
-	rect->bottom = rowsHeight;
-
-	DrawText(hdc, szContent[4], _tcslen(szContent[4]), rect, DT_WORDBREAK);
-
-	return rowsHeight;
+	return height;
 }
 
 void DrawWindow(HWND hWnd, HDC hdc)
@@ -156,21 +149,26 @@ void DrawWindow(HWND hWnd, HDC hdc)
 	{
 		return;
 	}
+	
 	SelectObject(hdc, GetStockObject(DC_PEN));
 	SetDCPenColor(hdc, RGB(0, 0, 0));
 	GetClientRect(hWnd, &rcClient);
-	int width = rcClient.right;
-
-	int columnsWidth = width / columnsCount;
-
-	int rowHeight = DrawRow(hdc, columnsWidth, columnsCount);
 	
-	/*for (auto i = 0; i <= rowsCount; i++) {
-		DrawLine(hdc, 0, i*rowsHeight, columnsCount*columnsWidth, i*rowsHeight);
-	}*/
-	/*for (auto i = 0; i <= columnsCount; i++) {
-		DrawLine(hdc, i*columnsWidth, 0, i*columnsWidth, rowsCount*rowsHeight);
-	}*/
+	int width = rcClient.right;
+	int rowsHeight = 0;
+	int columnsWidth = width / columnsCount;
+	
+	DrawLine(hdc, 0, 0, columnsCount*columnsWidth, 0);
+	for (int i = 0; i < rowsCount; i++) 
+	{		
+		rowsHeight += DrawRow(hdc, columnsWidth, columnsCount, 1+rowsHeight, i)+1;
+		DrawLine(hdc, 0, rowsHeight, columnsCount*columnsWidth, rowsHeight);
+	}
+
+	for (auto i = 0; i <= columnsCount; i++) {
+		DrawLine(hdc, i*columnsWidth, 0, i*columnsWidth, rowsHeight);
+	}
+	changeSize = FALSE;
 }
 
 #pragma endregion 
@@ -237,12 +235,13 @@ INT_PTR CALLBACK ChangeGridSize(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 			
 			rowsCount = _ttoi(rows);
 			columnsCount = _ttoi(cols);
-			if(rowsCount == 0 || columnsCount == 0 || rowsCount > 10 || columnsCount > 10)
+			if(rowsCount == 0 || columnsCount == 0 || rowsCount > MAX_NUMBER || columnsCount > MAX_NUMBER)
 			{
 				SetDlgItemText(hDlg, IDC_ERROR_MESSAGE, L"Wrong numbers.\nPlease enter 1<=x<=10.");
 				return static_cast<INT_PTR>(FALSE);
 			}
 			HWND hWnd = GetParent(hDlg);
+			changeSize = TRUE;
 			SendMessage(hWnd, WM_PAINT, 0, 0);
 		}
 		case IDCANCEL:
