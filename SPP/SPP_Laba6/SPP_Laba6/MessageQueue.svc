@@ -1,0 +1,1 @@
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="SPP_Laba6.MessageQueue" CodeBehind="MessageQueue.svc.cs" %>
