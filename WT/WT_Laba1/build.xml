@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="WT_Lab" default="docs" basedir="." xmlns="">
+    <description>
+        Web technology first lab.
+    </description>
+    <property name="src" location="src"/>
+    <property name="lib" value="lib"/>
+    <property name="build.dir" value="build"/>
+    <property name="build.docs" value="${build.dir}/docs"/>
+
+    <target name="init" depends="clean" description="create out folder">
+        <tstamp/>
+        <mkdir dir="${build.dir}"/>
+    </target>
+
+    <target name="compile" depends="init"
+            description="compile the source">
+        <javac includeantruntime="false"
+               srcdir="${src}"
+               destdir="${build.dir}"
+               failonerror="false"
+               classpath="${lib}\annotations-java8.jar;${lib}\modelmapper-1.1.0.jar"
+               optimize="true"
+               verbose="true"
+        />
+    </target>
+
+    <target name="clean"
+            description="clean up">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <target name="javadoc_check">
+        <uptodate property="javadoc.notrequired"
+                  targetfile="${build.docs}/packages.html">
+            <srcfiles dir="${src}" includes="**/*.java"/>
+        </uptodate>
+    </target>
+
+    <target name="docs" depends="javadoc_check"
+            unless="javadoc.notrequired"
+            description="creates the API documentation">
+        <mkdir dir="${build.docs}"/>
+        <javadoc useexternalfile="true"
+                 destdir="${build.docs}"
+                 author="true"
+                 version="true"
+                 locale="en"
+                 nodeprecated="true"
+                 nohelp="true"
+                 noindex="true"
+                 windowtitle="WT lab doc"
+                 doctitle="First lab of Web Technology course 2017. Created by Maxim Ermoshyn."
+                 private="true"
+                 classpath="${lib}\annotations-java8.jar;${lib}\modelmapper-1.1.0.jar"
+                 link="http://download.java.net/java/jdk9/docs/api/"
+                 verbose="true">
+            <packageset dir="${src}"/>
+        </javadoc>
+    </target>
+</project>
