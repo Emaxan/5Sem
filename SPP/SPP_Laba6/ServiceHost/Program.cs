@@ -15,8 +15,6 @@ namespace ServiceHost
             {
                 messageQueueHost.AddServiceEndpoint(typeof(IMessageQueue), new WSHttpBinding(), "");
 
-                messageQueueHost.Opened += MessageQueueHost_Opened;
-
                 var serviceBehavior = new ServiceMetadataBehavior
                                       {
                                           HttpGetEnabled = true
@@ -24,16 +22,10 @@ namespace ServiceHost
                 messageQueueHost.Description.Behaviors.Add(serviceBehavior);
 
                 messageQueueHost.Open();
-                Console.WriteLine($"Service is live now at: {httpBaseAddress}");
+                Console.WriteLine($"Service is live now at: {httpBaseAddress}\n\n");
                 Console.ReadKey();
                 messageQueueHost.Close();
             }
-        }
-
-        private static void MessageQueueHost_Opened(object sender, EventArgs e)
-        {
-            Worker worker = new Worker();
-            worker.Start();
         }
     }
 }

@@ -4,18 +4,25 @@ namespace SPP_Laba6
 {
     public class Message
     {
-        private string _message;
-        private string _parameters;
+        public string Msg { get; }
+
+        public string Parameters { get; }
+
 
         public Message(string message, string parameters)
         {
-            _message = message;
-            _parameters = parameters;
+            Msg = message;
+            Parameters = parameters;
         }
 
-        public static void Perform(Message message)
+        public static string Perform(Message message)
         {
-            throw new NotImplementedException(nameof(Perform));
+            return $"Message performed.\n{message}";
+        }
+
+        public override string ToString()
+        {
+            return $"Message: {Msg}\nParameters: {Parameters}\n\n";
         }
     }
 }

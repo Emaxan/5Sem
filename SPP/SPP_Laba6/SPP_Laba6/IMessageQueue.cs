@@ -7,11 +7,18 @@ namespace SPP_Laba6
 	public interface IMessageQueue
 	{
         [OperationContract]
-	    Guid AddMassage(string message, string parameters);
+	    void AddMassage(string message, string parameters);
 
         [OperationContract]
-	    bool RemoveMessage(Guid guid);
-	}
+	    bool RemoveMessage();
+
+	    [OperationContract]
+	    void Dump();
+
+	    [OperationContract]
+	    void Restore();
+
+    }
 
 
     //// Use a data contract as illustrated in the sample below to add composite types to service operations.

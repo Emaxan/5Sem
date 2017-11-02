@@ -16,16 +16,28 @@ namespace Client.MessageQueue {
     public interface IMessageQueue {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMessageQueue/AddMassage", ReplyAction="http://tempuri.org/IMessageQueue/AddMassageResponse")]
-        System.Guid AddMassage(string message, string parameters);
+        void AddMassage(string message, string parameters);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMessageQueue/AddMassage", ReplyAction="http://tempuri.org/IMessageQueue/AddMassageResponse")]
-        System.Threading.Tasks.Task<System.Guid> AddMassageAsync(string message, string parameters);
+        System.Threading.Tasks.Task AddMassageAsync(string message, string parameters);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMessageQueue/RemoveMessage", ReplyAction="http://tempuri.org/IMessageQueue/RemoveMessageResponse")]
-        bool RemoveMessage(System.Guid guid);
+        bool RemoveMessage();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMessageQueue/RemoveMessage", ReplyAction="http://tempuri.org/IMessageQueue/RemoveMessageResponse")]
-        System.Threading.Tasks.Task<bool> RemoveMessageAsync(System.Guid guid);
+        System.Threading.Tasks.Task<bool> RemoveMessageAsync();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMessageQueue/Dump", ReplyAction="http://tempuri.org/IMessageQueue/DumpResponse")]
+        void Dump();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMessageQueue/Dump", ReplyAction="http://tempuri.org/IMessageQueue/DumpResponse")]
+        System.Threading.Tasks.Task DumpAsync();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMessageQueue/Restore", ReplyAction="http://tempuri.org/IMessageQueue/RestoreResponse")]
+        void Restore();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IMessageQueue/Restore", ReplyAction="http://tempuri.org/IMessageQueue/RestoreResponse")]
+        System.Threading.Tasks.Task RestoreAsync();
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -55,20 +67,36 @@ namespace Client.MessageQueue {
                 base(binding, remoteAddress) {
         }
         
-        public System.Guid AddMassage(string message, string parameters) {
-            return base.Channel.AddMassage(message, parameters);
+        public void AddMassage(string message, string parameters) {
+            base.Channel.AddMassage(message, parameters);
         }
         
-        public System.Threading.Tasks.Task<System.Guid> AddMassageAsync(string message, string parameters) {
+        public System.Threading.Tasks.Task AddMassageAsync(string message, string parameters) {
             return base.Channel.AddMassageAsync(message, parameters);
         }
         
-        public bool RemoveMessage(System.Guid guid) {
-            return base.Channel.RemoveMessage(guid);
+        public bool RemoveMessage() {
+            return base.Channel.RemoveMessage();
         }
         
-        public System.Threading.Tasks.Task<bool> RemoveMessageAsync(System.Guid guid) {
-            return base.Channel.RemoveMessageAsync(guid);
+        public System.Threading.Tasks.Task<bool> RemoveMessageAsync() {
+            return base.Channel.RemoveMessageAsync();
+        }
+        
+        public void Dump() {
+            base.Channel.Dump();
+        }
+        
+        public System.Threading.Tasks.Task DumpAsync() {
+            return base.Channel.DumpAsync();
+        }
+        
+        public void Restore() {
+            base.Channel.Restore();
+        }
+        
+        public System.Threading.Tasks.Task RestoreAsync() {
+            return base.Channel.RestoreAsync();
         }
     }
 }

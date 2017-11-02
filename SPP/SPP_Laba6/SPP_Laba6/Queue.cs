@@ -6,9 +6,19 @@ namespace SPP_Laba6
     {
         private readonly Queue<Message> _queue = new Queue<Message>();
 
-        public void Add(Message message)
+        public void Enqueue(Message message)
         {
             _queue.Enqueue(message);
+        }
+
+        public Message Dequeue()
+        {
+            return _queue.Dequeue();
+        }
+
+        public Message Peek()
+        {
+            return _queue.Count == 0 ? null : _queue.Peek();
         }
     }
 }
