@@ -1,0 +1,20 @@
+﻿@using OOP.Models
+@model System.Collections.Generic.List<OOP.Models.Pizza>
+
+@{
+    ViewBag.Title = "Catalog";
+}
+
+<h2>Pizza list:</h2>
+<ul>
+
+    @foreach(Pizza t in @Model)
+    {
+        <li>
+            <h4>@t.Name</h4>
+            <p>Cost: @t.Cost</p>
+            <p>Description: @t.Description</p>
+        </li>
+    }
+
+</ul>

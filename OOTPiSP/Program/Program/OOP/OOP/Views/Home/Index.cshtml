@@ -1,0 +1,17 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="jumbotron">
+    Hello, User.
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        @Html.ActionLink("Create pizza", "Create", "Pizza")
+    </div>
+
+    <div class="col-md-4">
+        @Html.ActionLink("Show pizza list", "Index", "Pizza")
+    </div>
+</div>
