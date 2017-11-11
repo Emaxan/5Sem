@@ -1,0 +1,26 @@
+﻿@model OOP.Models.Pizza
+
+@{
+    ViewBag.Title = "Create pizza";
+}
+
+<h2>Create Pizza</h2>
+<form method="post" action="@Url.Action("Create")">
+    <table>
+        <tr>
+            <td>Name:</td>
+            <td><input type="text" name="Name" value="@Model.Name" required/></td>
+        </tr>
+        <tr>
+            <td>Cost:</td>
+            <td><input type="number" name="Cost" value="@Model.Cost" required/></td>
+        </tr>
+        <tr>
+            <td>Description:</td>
+            <td><input type="text" name="Description" value="@Model.Description" required/></td>
+        </tr>
+        <tr>
+            <td><input type="submit" value="Create"/></td>
+        </tr>
+    </table>
+</form>
