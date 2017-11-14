@@ -3,7 +3,7 @@ package by.bsuir.MY.domain.exception;
 /**
  * TODO.
  */
-public class ArgumentException extends Exception {
+public class ArgumentException extends RuntimeException {
 
     /**
      * TODO.

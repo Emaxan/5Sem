@@ -18,7 +18,7 @@ public final class Main {
     /**
      * TODO.
      */
-    private static int clientCount = 5;
+    private static int clientCount = 2;
 
     /**
      * TODO.

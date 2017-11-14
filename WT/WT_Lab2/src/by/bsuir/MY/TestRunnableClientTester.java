@@ -42,7 +42,7 @@ public class TestRunnableClientTester implements Runnable {
             System.out.println(Thread.currentThread().getId() + " Client oos & ois initialized");
 
             int i = 0;
-            while (i < 3) {
+            while (i < 2) {
 
                 oos.writeUTF("clientCommand " + i);
 

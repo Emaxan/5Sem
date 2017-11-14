@@ -1,6 +1,10 @@
 package by.bsuir.MY.view;
 
 import by.bsuir.MY.view.command.Command;
+import by.bsuir.MY.view.command.CreateFileCommand;
+import by.bsuir.MY.view.command.DeleteFile;
+import by.bsuir.MY.view.command.EditFile;
+import by.bsuir.MY.view.command.GetFile;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,8 +20,14 @@ public final class CommandProvider {
 
     /**
      * TODO.
+     *
+     * @param application TODO.
      */
-    public CommandProvider() {
+    public CommandProvider(final App application) {
+        commands.put("getFile", new GetFile(application));
+        commands.put("createFile", new CreateFileCommand(application));
+        commands.put("deleteFile", new DeleteFile(application));
+        commands.put("editFile", new EditFile(application));
     }
 
     /**

@@ -1,20 +1,23 @@
 package by.bsuir.MY.domain;
 
+import by.bsuir.MY.dal.model.interf.Entity;
+import by.bsuir.MY.domain.exception.WrongDataException;
+
 /**
  * TODO.
  */
-public class File {
+public class File implements Entity {
     /**
      * TODO.
      */
-    private int id;
+    private Integer id;
 
     /**
      * TODO.
      *
      * @return TODO.
      */
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -23,7 +26,7 @@ public class File {
      *
      * @param id TODO.
      */
-    public void setId(final int id) {
+    public void setId(final Integer id) {
         this.id = id;
     }
 
@@ -104,6 +107,24 @@ public class File {
     /**
      * TODO.
      *
+     * @return TODO.
+     */
+    public String getPhrase() {
+        return phrase;
+    }
+
+    /**
+     * TODO.
+     *
+     * @param phrase TODO.
+     */
+    public void setPhrase(final String phrase) {
+        this.phrase = phrase;
+    }
+
+    /**
+     * TODO.
+     *
      * @param o TODO.
      * @return TODO.
      */
@@ -137,5 +158,117 @@ public class File {
         result = 31 * result + (getSurnameName() != null ? getSurnameName().hashCode() : 0);
         result = 31 * result + (phrase != null ? phrase.hashCode() : 0);
         return result;
+    }
+
+    /**
+     * TODO.
+     *
+     * @return TODO.
+     */
+    @Override
+    public String toString() {
+        return "<File><Id>"
+                + getId().toString()
+                + "</Id><FirstName>"
+                + getFirstName()
+                + "</FirstName><LastName>"
+                + getLastName()
+                + "</LastName><SurnameName>"
+                + getSurnameName()
+                + "</SurnameName><Phrase>"
+                + getPhrase()
+                + "</Phrase></File>";
+    }
+
+    /**
+     * Initialize entity from string representation.
+     *
+     * @param record String to parse.
+     */
+    @Override
+    public void fromString(final String record) throws WrongDataException {
+        if (!record.startsWith("<File>")) {
+            throw new WrongDataException("Wrong xml data.");
+        }
+        String str = record.substring("<File>".length(), record.length() - "<File>".length() - "</File>".length());
+
+        if (!str.startsWith("<Id>")) {
+            throw new WrongDataException("Wrong xml data.");
+        }
+        str = str.substring("<Id>".length());
+        int length = str.indexOf("</Id>");
+        int ids;
+        try{
+            ids = Integer.parseInt(str.substring(0, length));
+        } catch (NumberFormatException e) {
+            throw new WrongDataException("Wrong xml data.");
+        }
+        str = str.substring(length).substring("</Id>".length());
+
+        if (!str.startsWith("<FirstName>")) {
+            throw new WrongDataException("Wrong xml data.");
+        }
+        str = str.substring("<FirstName>".length());
+        length = str.indexOf("</FirstName>");
+        String firstNames;
+        firstNames = str.substring(0, length);
+        str = str.substring(length).substring("</FirstName>".length());
+
+        if (!str.startsWith("<LastName>")) {
+            throw new WrongDataException("Wrong xml data.");
+        }
+        str = str.substring("<LastName>".length());
+        length = str.indexOf("</LastName>");
+        String lastNames;
+        lastNames = str.substring(0, length);
+        str = str.substring(length).substring("</LastName>".length());
+
+        if (!str.startsWith("<SurnameName>")) {
+            throw new WrongDataException("Wrong xml data.");
+        }
+        str = str.substring("<SurnameName>".length());
+        length = str.indexOf("</SurnameName>");
+        String surnameNames;
+        surnameNames = str.substring(0, length);
+        str = str.substring(length).substring("</SurnameName>".length());
+
+        if (!str.startsWith("<Phrase>")) {
+            throw new WrongDataException("Wrong xml data.");
+        }
+        str = str.substring("<Phrase>".length());
+        length = str.indexOf("</Phrase>");
+        String phrases;
+        phrases = str.substring(0, length);
+        str = str.substring(length).substring("</Phrase>".length());
+
+        setId(ids);
+        setFirstName(firstNames);
+        setLastName(lastNames);
+        setSurnameName(surnameNames);
+        setPhrase(phrases);
+
+    }
+
+    /**
+     * Check primary key.
+     *
+     * @param key Primary key.
+     * @return {@code True} on success, {@code False} otherwise.
+     */
+    @Override
+    public boolean checkPrimaryKey(final Object... key) {
+        return key.length == 1
+                && key[0] instanceof Integer
+                && key[0] == id;
+    }
+
+    /**
+     * Get primary key of this entity.
+     *
+     * @return Primary key.
+     */
+    @Override
+    public Object[] getPrimaryKey() {
+        return new Object[]{id};
     }
 }

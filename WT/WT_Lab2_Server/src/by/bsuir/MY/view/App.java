@@ -6,6 +6,7 @@
 package by.bsuir.MY.view;
 
 import by.bsuir.MY.MonoThreadClientHandler;
+import by.bsuir.MY.dal.dbcontext.DBContext;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,7 +20,10 @@ import java.util.concurrent.Executors;
  * Application class. Contain main functionality.
  */
 public class App {
-
+    /**
+     * Database context.
+     */
+    private DBContext ctx;
     /**
      * TODO.
      */
@@ -27,8 +31,20 @@ public class App {
 
     /**
      * Create new instance of {@link App}.
+     *
+     * @param context TODO.
      */
-    public App() {
+    public App(final DBContext context) {
+        ctx = context;
+    }
+
+    /**
+     * TODO.
+     *
+     * @return TODO.
+     */
+    public DBContext getCtx() {
+        return ctx;
     }
 
     /**
@@ -53,7 +69,7 @@ public class App {
                 }
 
                 Socket client = server.accept();
-                executeIt.execute(new MonoThreadClientHandler(client));
+                executeIt.execute(new MonoThreadClientHandler(client, this));
                 System.out.println(Thread.currentThread().getId() + " Connection accepted.");
             }
 

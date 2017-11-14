@@ -1,6 +1,10 @@
 package by.bsuir.MY;
 
+import by.bsuir.MY.domain.ServiceResponse;
+import by.bsuir.MY.view.App;
 import by.bsuir.MY.view.Controller;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -21,15 +25,17 @@ public class MonoThreadClientHandler implements Runnable {
     /**
      * TODO.
      */
-    private Controller controller = new Controller();
+    private Controller controller;
 
     /**
      * TODO.
      *
      * @param client TODO.
+     * @param application TODO.
      */
-    public MonoThreadClientHandler(final Socket client) {
+    public MonoThreadClientHandler(final Socket client, final App application) {
         MonoThreadClientHandler.clientDialog = client;
+        controller = new Controller(application);
     }
 
     /**
@@ -62,8 +68,12 @@ public class MonoThreadClientHandler implements Runnable {
 //                    Thread.sleep(3000);
 //                    break;
 //                }
-                String reply = controller.doAction(entry);
-                out.writeUTF(reply);
+                ServiceResponse reply = controller.doAction(entry);
+                GsonBuilder gsonBuilder = new GsonBuilder();
+                Gson gson = gsonBuilder.create();
+                String result = gson.toJson(reply);
+                System.out.println(result);
+                out.writeUTF(result);
                 synchronized (System.out) {
                     System.out.println(Thread.currentThread().getId() + " Server Wrote message to clientDialog.");
                 }

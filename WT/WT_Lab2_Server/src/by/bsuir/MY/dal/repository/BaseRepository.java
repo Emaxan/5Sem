@@ -78,6 +78,7 @@ public class BaseRepository<TEntity extends Entity>
     @Override
     public void create(final TEntity entity) {
         try {
+            setId(entity);
             dbSet.add(entity);
         } catch (EntityAlreadyExistException e) {
             //TODO.

@@ -5,6 +5,8 @@
 
 package by.bsuir.MY.view.command;
 
+import by.bsuir.MY.domain.ServiceResponse;
+
 /**
  * Command pattern for interacting with user.
  */
@@ -14,7 +16,7 @@ public interface Command {
      *
      * @param request TODO.
      */
-    String execute(String request);
+    ServiceResponse execute(String request);
 
     /**
      * Get message, that describe command.

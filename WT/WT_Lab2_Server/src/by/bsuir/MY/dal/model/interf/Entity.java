@@ -5,6 +5,8 @@
 
 package by.bsuir.MY.dal.model.interf;
 
+import by.bsuir.MY.domain.exception.WrongDataException;
+
 /**
  * General interface of entities of application.
  */
@@ -37,7 +39,7 @@ public interface Entity {
      *
      * @param record String to parse.
      */
-    void fromString(String record);
+    void fromString(String record) throws WrongDataException;
 
     /**
      * Check primary key.

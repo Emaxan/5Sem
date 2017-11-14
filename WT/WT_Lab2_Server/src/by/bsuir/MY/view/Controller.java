@@ -2,7 +2,6 @@ package by.bsuir.MY.view;
 
 import by.bsuir.MY.domain.Interf.ServiceResponseCode;
 import by.bsuir.MY.domain.ServiceResponse;
-import by.bsuir.MY.domain.exception.ArgumentException;
 import by.bsuir.MY.view.command.Command;
 
 /**
@@ -12,7 +11,16 @@ public class Controller {
     /**
      * TODO.
      */
-    private final CommandProvider provider = new CommandProvider();
+    private final CommandProvider provider;
+
+    /**
+     * TODO.
+     *
+     * @param application TODO.
+     */
+    public Controller(final App application) {
+        provider = new CommandProvider(application);
+    }
 
     /**
      * TODO.
@@ -21,7 +29,7 @@ public class Controller {
      * @throws ArgumentException TODO.
      * @return TODO.
      */
-    public ServiceResponse doAction(final String request) throws ArgumentException {
+    public ServiceResponse doAction(final String request) {
 
         String commandName;
 
@@ -33,8 +41,8 @@ public class Controller {
            return ServiceResponse.createUnsuccessful(ServiceResponseCode.BadRequest);
         }
 
-        String response = command.execute(request);
+        String params = request.substring(request.indexOf("|"));
 
-        return ServiceResponse.createSuccessful(response);
+        return command.execute(params);
     }
 }
