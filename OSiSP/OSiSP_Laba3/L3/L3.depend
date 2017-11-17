@@ -1,0 +1,21 @@
+# depslib dependency file v1.0
+1509183961 source:c:\users\asus-pc\desktop\ÓÍÈÂÅĞ\5 ñåì\ÎÑÈÑÏ\l3\l3\l3\l3_stat.cpp
+	"stdafx.h"
+	<string.h>
+	<wchar.h>
+	<iostream>
+	"../DLL/library.h"
+
+1508850986 c:\users\asus-pc\desktop\ÓÍÈÂÅĞ\5 ñåì\ÎÑÈÑÏ\l3\l3\l3\stdafx.h
+	"targetver.h"
+	<stdio.h>
+	<tchar.h>
+
+1509183434 c:\users\asus-pc\desktop\ÓÍÈÂÅĞ\5 ñåì\ÎÑÈÑÏ\l3\l3\l3\targetver.h
+
+1509183861 c:\users\asus-pc\desktop\ÓÍÈÂÅĞ\5 ñåì\ÎÑÈÑÏ\l3\l3\dll\library.h
+	<windows.h>
+
+1508853710 source:c:\users\asus-pc\desktop\ÓÍÈÂÅĞ\5 ñåì\ÎÑÈÑÏ\l3\l3\l3\stdafx.cpp
+	"stdafx.h"
+
