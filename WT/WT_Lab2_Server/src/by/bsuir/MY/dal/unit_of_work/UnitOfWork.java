@@ -21,7 +21,7 @@ public class UnitOfWork implements by.bsuir.MY.dal.unit_of_work.UoW {
     /**
      * Map of repositories.
      */
-    private final Map<Class, Object> repositoriesMap = new HashMap<>();
+    protected final Map<Class, Object> repositoriesMap = new HashMap<>();
     /**
      * Database context.
      */

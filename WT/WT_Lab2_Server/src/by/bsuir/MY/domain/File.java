@@ -4,129 +4,129 @@ import by.bsuir.MY.dal.model.interf.Entity;
 import by.bsuir.MY.domain.exception.WrongDataException;
 
 /**
- * TODO.
+ * .
  */
 public class File implements Entity {
     /**
-     * TODO.
+     * .
      */
     private Integer id;
 
     /**
-     * TODO.
+     * .
      *
-     * @return TODO.
+     * @return .
      */
     public Integer getId() {
         return id;
     }
 
     /**
-     * TODO.
+     * .
      *
-     * @param id TODO.
+     * @param id .
      */
     public void setId(final Integer id) {
         this.id = id;
     }
 
     /**
-     * TODO.
+     * .
      */
     private String firstName;
 
     /**
-     * TODO.
+     * .
      *
-     * @return TODO.
+     * @return .
      */
     public String getFirstName() {
         return firstName;
     }
 
     /**
-     * TODO.
+     * .
      *
-     * @param firstName TODO.
+     * @param firstName .
      */
     public void setFirstName(final String firstName) {
         this.firstName = firstName;
     }
 
     /**
-     * TODO.
+     * .
      */
     private String lastName;
 
     /**
-     * TODO.
+     * .
      *
-     * @return TODO.
+     * @return .
      */
     public String getLastName() {
         return lastName;
     }
 
     /**
-     * TODO.
+     * .
      *
-     * @param lastName TODO.
+     * @param lastName .
      */
     public void setLastName(final String lastName) {
         this.lastName = lastName;
     }
 
     /**
-     * TODO.
+     * .
      */
     private String surnameName;
 
     /**
-     * TODO.
+     * .
      *
-     * @return TODO.
+     * @return .
      */
     public String getSurnameName() {
         return surnameName;
     }
 
     /**
-     * TODO.
+     * .
      *
-     * @param surnameName TODO.
+     * @param surnameName .
      */
     public void setSurnameName(final String surnameName) {
         this.surnameName = surnameName;
     }
 
     /**
-     * TODO.
+     * .
      */
     private String phrase;
 
     /**
-     * TODO.
+     * .
      *
-     * @return TODO.
+     * @return .
      */
     public String getPhrase() {
         return phrase;
     }
 
     /**
-     * TODO.
+     * .
      *
-     * @param phrase TODO.
+     * @param phrase .
      */
     public void setPhrase(final String phrase) {
         this.phrase = phrase;
     }
 
     /**
-     * TODO.
+     * .
      *
-     * @param o TODO.
-     * @return TODO.
+     * @param o .
+     * @return .
      */
     @Override
     public boolean equals(final Object o) {
@@ -146,9 +146,9 @@ public class File implements Entity {
     }
 
     /**
-     * TODO.
+     * .
      *
-     * @return TODO.
+     * @return .
      */
     @Override
     public int hashCode() {
@@ -161,9 +161,9 @@ public class File implements Entity {
     }
 
     /**
-     * TODO.
+     * .
      *
-     * @return TODO.
+     * @return .
      */
     @Override
     public String toString() {
@@ -190,7 +190,7 @@ public class File implements Entity {
         if (!record.startsWith("<File>")) {
             throw new WrongDataException("Wrong xml data.");
         }
-        String str = record.substring("<File>".length(), record.length() - "<File>".length() - "</File>".length());
+        String str = record.substring("<File>".length(), record.length() - "</File>".length());
 
         if (!str.startsWith("<Id>")) {
             throw new WrongDataException("Wrong xml data.");

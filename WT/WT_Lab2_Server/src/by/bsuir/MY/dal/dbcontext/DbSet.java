@@ -3,6 +3,7 @@ package by.bsuir.MY.dal.dbcontext;
 import by.bsuir.MY.dal.exception.EntityAlreadyExistException;
 import by.bsuir.MY.dal.exception.EntityNotFoundException;
 import by.bsuir.MY.dal.model.interf.Entity;
+import by.bsuir.MY.domain.exception.WrongDataException;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -71,7 +72,11 @@ public class DbSet<TEntity extends Entity> {
                     "There are no entities with that primary key in database."
             );
         }
-        e.fromString(entity.toString());
+        try {
+            e.fromString(entity.toString());
+        } catch (WrongDataException e1) {
+            e1.printStackTrace(); //TODO
+        }
     }
 
     /**

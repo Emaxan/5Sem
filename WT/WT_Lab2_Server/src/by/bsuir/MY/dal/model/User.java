@@ -235,7 +235,6 @@ public class User
      * @param record String to parse.
      */
     @Override
-    @SuppressWarnings("all")
     public void fromString(final String record) {
         String[] fields = record.split(getSpecialSymbol());
 

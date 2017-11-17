@@ -4,36 +4,37 @@ import by.bsuir.MY.domain.Interf.ServiceResponseCode;
 import by.bsuir.MY.domain.ServiceResponse;
 import by.bsuir.MY.view.command.Command;
 
+import java.util.regex.Pattern;
+
 /**
- * TODO.
+ * .
  */
 public class Controller {
     /**
-     * TODO.
+     * .
      */
     private final CommandProvider provider;
 
     /**
-     * TODO.
+     * .
      *
-     * @param application TODO.
+     * @param application .
      */
     public Controller(final App application) {
         provider = new CommandProvider(application);
     }
 
     /**
-     * TODO.
+     * .
      *
-     * @param request TODO.
-     * @throws ArgumentException TODO.
-     * @return TODO.
+     * @param request .
+     * @return .
      */
     public ServiceResponse doAction(final String request) {
 
         String commandName;
 
-        commandName = request.split("|")[0];
+        commandName = request.split(Pattern.quote("|"))[0];
 
         Command command = provider.getCommand(commandName);
 
@@ -41,7 +42,7 @@ public class Controller {
            return ServiceResponse.createUnsuccessful(ServiceResponseCode.BadRequest);
         }
 
-        String params = request.substring(request.indexOf("|"));
+        String params = request.substring(request.indexOf("|") + 1);
 
         return command.execute(params);
     }

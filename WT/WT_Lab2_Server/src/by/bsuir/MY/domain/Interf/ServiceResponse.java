@@ -1,20 +1,20 @@
 package by.bsuir.MY.domain.Interf;
 
 /**
- * TODO.
+ * .
  */
 public interface ServiceResponse {
     /**
-     * TODO.
+     * .
      *
-     * @return TODO.
+     * @return .
      */
     ServiceResponseCode getCode();
 
     /**
-     * TODO.
+     * .
      *
-     * @return TODO.
+     * @return .
      */
     Object getContent();
 }

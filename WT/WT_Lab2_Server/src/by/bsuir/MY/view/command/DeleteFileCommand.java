@@ -6,7 +6,6 @@ import by.bsuir.MY.dal.model.Role;
 import by.bsuir.MY.domain.File;
 import by.bsuir.MY.domain.Interf.ServiceResponseCode;
 import by.bsuir.MY.domain.ServiceResponse;
-import by.bsuir.MY.domain.ServiceResponseGeneric;
 import by.bsuir.MY.view.App;
 
 import java.util.regex.Pattern;
@@ -14,7 +13,8 @@ import java.util.regex.Pattern;
 /**
  * .
  */
-public class CreateFileCommand extends BaseCommand implements Command {
+public class DeleteFileCommand extends BaseCommand implements Command {
+
     /**
      * .
      */
@@ -26,8 +26,8 @@ public class CreateFileCommand extends BaseCommand implements Command {
      *
      * @param application .
      */
-    public CreateFileCommand(final App application) {
-        super("Create file", application.getCtx());
+    public DeleteFileCommand(final App application) {
+        super("Delete file", application.getCtx());
         app = application;
 
         ServiceProvider sp = new ServiceProvider(getCtx());
@@ -37,21 +37,18 @@ public class CreateFileCommand extends BaseCommand implements Command {
     /**
      * Execute the command.
      *
-     * @param params .
+     * @param request .
      */
     @Override
-    public ServiceResponse execute(final String params) {
+    public ServiceResponse execute(final String request) {
         if (app.getUser() == null || app.getUser().getRole() == Role.USER) {
             return ServiceResponse.createUnsuccessful(ServiceResponseCode.AccessDenied);
         }
-        File file = new File();
-        String[] p = params.split(Pattern.quote("|"));
-        file.setFirstName(p[0]);
-        file.setLastName(p[1]);
-        file.setSurnameName(p[2]);
-        file.setPhrase(p[3]);
-
-        fileService.create(file);
+        try {
+            fileService.delete(fileService.get(Integer.parseInt(request)));
+        } catch (NumberFormatException e) {
+            return ServiceResponse.createUnsuccessful(ServiceResponseCode.WrongParameters);
+        }
         return ServiceResponse.createSuccessful();
     }
 }

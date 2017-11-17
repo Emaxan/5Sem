@@ -7,6 +7,7 @@ package by.bsuir.MY.dal.dbcontext;
 
 import by.bsuir.MY.dal.exception.EntityAlreadyExistException;
 import by.bsuir.MY.dal.model.interf.Entity;
+import by.bsuir.MY.domain.exception.WrongDataException;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -67,11 +68,15 @@ public final class FilesDBContext implements DBContext {
             String line;
             while ((line = rd.readLine()) != null) {
                 TEntity entity = entityClass.getConstructor().newInstance();
-                entity.fromString(line);
+                try {
+                    entity.fromString(line);
+                } catch (WrongDataException e) {
+                    e.printStackTrace(); //TODO
+                }
                 try {
                     set.add(entity);
                 } catch (EntityAlreadyExistException e) {
-                    //TODO.
+                    //TODO
                 }
             }
         } catch (IllegalAccessException

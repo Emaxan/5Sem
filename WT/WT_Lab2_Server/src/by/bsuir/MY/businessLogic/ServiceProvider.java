@@ -12,6 +12,10 @@ public final class ServiceProvider {
      */
     private static FileService fileService;
     /**
+     * Auth service.
+     */
+    private static AuthenticationService authenticationService;
+    /**
      * Database context.
      */
     private DBContext context;
@@ -35,5 +39,17 @@ public final class ServiceProvider {
             fileService = new FileService(context);
         }
         return fileService;
+    }
+
+    /**
+     * Get instance of Auth service.
+     *
+     * @return Auth service.
+     */
+    public AuthenticationService getAuthService() {
+        if (authenticationService == null) {
+            authenticationService = new AuthenticationService(context);
+        }
+        return authenticationService;
     }
 }

@@ -4,22 +4,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * TODO.
+ * .
  */
 public final class ServiceResponseMessage {
 
     /**
-     * TODO.
+     * .
      */
     private static Map<ServiceResponseCode, String> messages = new HashMap<>();
 
     static{
-        messages.put(ServiceResponseCode.Ok, "Ok");
+        messages.put(ServiceResponseCode.Success, "Success");
         messages.put(ServiceResponseCode.BadRequest, "Bad request");
+        messages.put(ServiceResponseCode.WrongParameters, "Wrong parameters");
+        messages.put(ServiceResponseCode.EntityNotFount, "Entity not found");
+        messages.put(ServiceResponseCode.AccessDenied, "Access denied");
     }
 
     /**
-     * TODO.
+     * .
      */
     private ServiceResponseMessage() {
     }
@@ -27,10 +30,10 @@ public final class ServiceResponseMessage {
 
 
     /**
-     * TODO.
+     * .
      *
-     * @param code TODO.
-     * @return TODO.
+     * @param code .
+     * @return .
      */
     public static String getMessage(final ServiceResponseCode code) {
         return messages.get(code);

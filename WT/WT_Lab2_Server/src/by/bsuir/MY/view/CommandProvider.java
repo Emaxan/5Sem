@@ -1,40 +1,38 @@
 package by.bsuir.MY.view;
 
-import by.bsuir.MY.view.command.Command;
-import by.bsuir.MY.view.command.CreateFileCommand;
-import by.bsuir.MY.view.command.DeleteFile;
-import by.bsuir.MY.view.command.EditFile;
-import by.bsuir.MY.view.command.GetFile;
+import by.bsuir.MY.view.command.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * TODO.
+ * .
  */
 public final class CommandProvider {
     /**
-     * TODO.
+     * .
      */
     private Map<String, Command> commands = new HashMap<>();
 
     /**
-     * TODO.
+     * .
      *
-     * @param application TODO.
+     * @param application .
      */
     public CommandProvider(final App application) {
-        commands.put("getFile", new GetFile(application));
+        commands.put("getFile", new GetFileCommand(application));
         commands.put("createFile", new CreateFileCommand(application));
-        commands.put("deleteFile", new DeleteFile(application));
-        commands.put("editFile", new EditFile(application));
+        commands.put("deleteFile", new DeleteFileCommand(application));
+        commands.put("editFile", new EditFileCommand(application));
+        commands.put("getAllFiles", new GetAllFilesCommand(application));
+        commands.put("signIn", new SignInCommand(application));
     }
 
     /**
-     * TODO.
+     * .
      *
-     * @param commandName TODO.
-     * @return TODO.
+     * @param commandName .
+     * @return .
      */
     Command getCommand(final String commandName) {
         Command command;

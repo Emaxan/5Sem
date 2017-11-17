@@ -6,8 +6,11 @@
 package by.bsuir.MY.dal.unit_of_work;
 
 import by.bsuir.MY.dal.dbcontext.DBContext;
+import by.bsuir.MY.dal.repository.BaseRepository;
 import by.bsuir.MY.dal.repository.UserRepository;
 import by.bsuir.MY.dal.repository.interf.UsrRepository;
+
+import java.util.Collection;
 
 /**
  * Unit of Work with repositories with special functionality.
@@ -48,6 +51,10 @@ public class WebTechLabUnitOfWork extends UnitOfWork implements WebTechLabUoW {
      */
     @Override
     public boolean saveChanges() {
-        return (userRepository == null || userRepository.saveChanges());
+        boolean result = true;
+        for(Object rep : (repositoriesMap.values())) {
+            result &= ((BaseRepository) rep).saveChanges();
+        }
+        return (userRepository == null || userRepository.saveChanges()) && result;
     }
 }

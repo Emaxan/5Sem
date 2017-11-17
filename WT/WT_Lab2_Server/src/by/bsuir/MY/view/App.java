@@ -7,6 +7,7 @@ package by.bsuir.MY.view;
 
 import by.bsuir.MY.MonoThreadClientHandler;
 import by.bsuir.MY.dal.dbcontext.DBContext;
+import by.bsuir.MY.dal.model.User;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,30 +22,52 @@ import java.util.concurrent.Executors;
  */
 public class App {
     /**
+     * User data.
+     */
+    private User user;
+    /**
      * Database context.
      */
     private DBContext ctx;
     /**
-     * TODO.
+     * .
      */
     private static ExecutorService executeIt = Executors.newFixedThreadPool(10);
 
     /**
      * Create new instance of {@link App}.
      *
-     * @param context TODO.
+     * @param context .
      */
     public App(final DBContext context) {
         ctx = context;
     }
 
     /**
-     * TODO.
+     * .
      *
-     * @return TODO.
+     * @return .
      */
     public DBContext getCtx() {
         return ctx;
+    }
+
+    /**
+     * Get user data.
+     *
+     * @return User data.
+     */
+    public User getUser() {
+        return user;
+    }
+
+    /**
+     * Set user data.
+     *
+     * @param us User data.
+     */
+    public void setUser(final User us) {
+        this.user = us;
     }
 
     /**

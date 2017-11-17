@@ -6,24 +6,24 @@ import by.bsuir.MY.domain.exception.ArgumentException;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * TODO.
+ * .
  */
 public class ServiceResponse
         implements by.bsuir.MY.domain.Interf.ServiceResponse {
     /**
-     * TODO.
+     * .
      */
     private ServiceResponseCode responseCode;
     /**
-     * TODO.
+     * .
      */
     private Object responseContent;
 
     /**
-     * TODO.
+     * .
      *
-     * @param code    TODO.
-     * @param content TODO.
+     * @param code    .
+     * @param content .
      */
     protected ServiceResponse(final ServiceResponseCode code, final Object content) {
         responseCode = code;
@@ -31,9 +31,9 @@ public class ServiceResponse
     }
 
     /**
-     * TODO.
+     * .
      *
-     * @param code TODO.
+     * @param code .
      */
     protected ServiceResponse(final ServiceResponseCode code) {
         responseCode = code;
@@ -41,11 +41,11 @@ public class ServiceResponse
     }
 
     /**
-     * TODO.
+     * .
      *
-     * @param content TODO.
-     * @param <T>     TODO.
-     * @return TODO.
+     * @param content .
+     * @param <T>     .
+     * @return .
      */
     @NotNull
     public static <T> ServiceResponseGeneric<T> createSuccessful(final T content) {
@@ -53,22 +53,25 @@ public class ServiceResponse
     }
 
     /**
-     * TODO.
+     * .
      *
-     * @return TODO.
+     * @return .
      */
     @NotNull
     public static ServiceResponse createSuccessful() {
-        return new ServiceResponse(ServiceResponseCode.Ok);
+        return new ServiceResponse(
+                ServiceResponseCode.Success,
+                ServiceResponseMessage.getMessage(ServiceResponseCode.Success)
+        );
     }
 
     /**
-     * TODO.
+     * .
      *
-     * @param code TODO.
-     * @param <T>  TODO.
-     * @throws ArgumentException TODO.
-     * @return TODO.
+     * @param code .
+     * @param <T>  .
+     * @throws ArgumentException .
+     * @return .
      */
     @NotNull
     public static ServiceResponseGeneric<String> createUnsuccessful(
@@ -83,9 +86,9 @@ public class ServiceResponse
     }
 
     /**
-     * TODO.
+     * .
      *
-     * @return TODO.
+     * @return .
      */
     @Override
     public ServiceResponseCode getCode() {
@@ -93,9 +96,9 @@ public class ServiceResponse
     }
 
     /**
-     * TODO.
+     * .
      *
-     * @return TODO.
+     * @return .
      */
     @Override
     public Object getContent() {

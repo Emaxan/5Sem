@@ -1,7 +1,7 @@
 package by.bsuir.MY.domain.exception;
 
 /**
- * TODO.
+ * .
  */
 public class WrongDataException extends Exception {
     /**
