@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://buildinglink.com/" />
+<title>CreateNewRequest</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">CreateNewRequest</td></tr>
+</thead><tbody>
+<tr>
+	<td>open</td>
+	<td>/v2/mgmt/default.aspx?PagePath=%2fv2%2fmgmt%2fdashboard%2fdashboard.aspx%3f</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>2000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>css=div.mb-text.mb-icon-_v2_mgmt_Dashboard_MaintenanceHome_aspx &gt; div.mb-text-inner &gt; a.mb-sublink.mb-sublink-first</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=New Request</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>5000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>css=span.b-Inn-Hy</td>
+	<td></td>
+</tr>
+<tr>
+	<td>pause</td>
+	<td>5000</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=ctl00_MainContentPlaceHolder_FvwRequest_TxtDescription</td>
+	<td>test</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>id=ctl00_MainContentPlaceHolder_FvwRequest_MaintCatDropdown1_DdlParentCategory</td>
+	<td>label=Appliances日本語 test</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>css=option[value=&quot;8866&quot;]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//a[@id='ctl00_MainContentPlaceHolder_BtnSaveNewRequest2']/span/span[3]</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>
