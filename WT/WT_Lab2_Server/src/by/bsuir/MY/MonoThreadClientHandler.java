@@ -1,6 +1,5 @@
 package by.bsuir.MY;
 
-import by.bsuir.MY.domain.Interf.ServiceResponseCode;
 import by.bsuir.MY.domain.ServiceResponse;
 import by.bsuir.MY.view.App;
 import by.bsuir.MY.view.Controller;
@@ -60,14 +59,6 @@ public class MonoThreadClientHandler implements Runnable {
 
                 synchronized (System.out) {
                     System.out.println(Thread.currentThread().getId() + " READ from clientDialog message - " + entry);
-                }
-                if (entry.equalsIgnoreCase("quit")) { //TODO
-                    synchronized (System.out) {
-                        System.out.println(Thread.currentThread().getId() + " Client initialize connections suicide ...");
-                    }
-                    out.writeUTF("Server reply - " + entry + " - OK");
-                    Thread.sleep(3000);
-                    break;
                 }
                 ServiceResponse reply = controller.doAction(entry);
                 GsonBuilder gsonBuilder = new GsonBuilder();

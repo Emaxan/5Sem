@@ -19,6 +19,7 @@ public final class ServiceResponseMessage {
         messages.put(ServiceResponseCode.WrongParameters, "Wrong parameters");
         messages.put(ServiceResponseCode.EntityNotFount, "Entity not found");
         messages.put(ServiceResponseCode.AccessDenied, "Access denied");
+        messages.put(ServiceResponseCode.XMLFail, "Wrong XML data");
     }
 
     /**

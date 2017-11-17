@@ -26,6 +26,7 @@ public final class CommandProvider {
         commands.put("editFile", new EditFileCommand(application));
         commands.put("getAllFiles", new GetAllFilesCommand(application));
         commands.put("signIn", new SignInCommand(application));
+        commands.put("signOut", new SignOutCommand(application));
     }
 
     /**

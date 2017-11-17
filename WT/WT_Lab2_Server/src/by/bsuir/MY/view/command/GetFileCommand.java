@@ -11,7 +11,13 @@ import by.bsuir.MY.view.App;
  * .
  */
 public class GetFileCommand extends BaseCommand implements Command {
+    /**
+     * .
+     */
     private FileService fileService;
+    /**
+     * .
+     */
     private App app;
 
     /**

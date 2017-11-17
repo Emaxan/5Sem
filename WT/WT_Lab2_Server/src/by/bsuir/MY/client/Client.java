@@ -72,7 +72,6 @@ public class Client {
                     } else {
                         System.err.println(res);
                     }
-//                    System.out.println(in);
                 } catch (EOFException | SocketException e) {
                     System.err.println(e.getMessage());
                     Thread.sleep(5000);
@@ -119,7 +118,6 @@ public class Client {
      * @param res .
      */
     private void printArray(final String res) {
-        String r = res.substring("<Array>".length(), res.length() - "</Array>".length());
         Pattern p = Pattern.compile("(<File>.*?</File>)");
         Matcher m = p.matcher(res);
         while (m.find()) {

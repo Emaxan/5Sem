@@ -11,6 +11,7 @@ import by.bsuir.MY.dal.exception.EntityAlreadyExistException;
 import by.bsuir.MY.dal.exception.EntityNotFoundException;
 import by.bsuir.MY.dal.model.interf.Entity;
 import by.bsuir.MY.dal.repository.interf.Repository;
+import by.bsuir.MY.domain.exception.WrongDataException;
 import org.jetbrains.annotations.Contract;
 
 import java.util.List;
@@ -112,7 +113,7 @@ public class BaseRepository<TEntity extends Entity>
      * @param entity {@link TEntity} to update.
      */
     @Override
-    public void update(final TEntity entity) throws EntityNotFoundException {
+    public void update(final TEntity entity) throws EntityNotFoundException, WrongDataException {
         dbSet.update(entity);
     }
 

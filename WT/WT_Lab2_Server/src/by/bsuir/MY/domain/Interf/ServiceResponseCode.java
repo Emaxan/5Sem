@@ -33,4 +33,9 @@ public enum ServiceResponseCode {
      * .
      */
     Success,
+
+    /**
+     * .
+     */
+    XMLFail,
 }

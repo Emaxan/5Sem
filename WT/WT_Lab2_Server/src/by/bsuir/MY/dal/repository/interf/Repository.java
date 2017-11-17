@@ -7,6 +7,7 @@ package by.bsuir.MY.dal.repository.interf;
 
 import by.bsuir.MY.dal.exception.EntityNotFoundException;
 import by.bsuir.MY.dal.model.interf.Entity;
+import by.bsuir.MY.domain.exception.WrongDataException;
 
 import java.util.List;
 
@@ -45,7 +46,7 @@ public interface Repository<TEntity extends Entity> {
      * @param o {@link TEntity} to update.
      * @throws EntityNotFoundException when Entity doesn't exist
      */
-    void update(TEntity o) throws EntityNotFoundException;
+    void update(TEntity o) throws EntityNotFoundException, WrongDataException;
 
     /**
      * Delete record from database.

@@ -9,9 +9,18 @@ import by.bsuir.MY.view.App;
 
 import java.util.regex.Pattern;
 
+/**
+ * .
+ */
 public class SignInCommand extends BaseCommand implements Command {
 
+    /**
+     * .
+     */
     private AuthenticationService authenticationService;
+    /**
+     * .
+     */
     private App app;
 
     /**

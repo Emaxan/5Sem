@@ -5,6 +5,7 @@ import by.bsuir.MY.dal.exception.EntityNotFoundException;
 import by.bsuir.MY.dal.unit_of_work.UnitOfWork;
 import by.bsuir.MY.dal.unit_of_work.WebTechLabUnitOfWork;
 import by.bsuir.MY.domain.File;
+import by.bsuir.MY.domain.exception.WrongDataException;
 
 import java.util.List;
 
@@ -50,7 +51,7 @@ public class FileService {
      * @param file .
      * @throws EntityNotFoundException .
      */
-    public void update(final File file) throws EntityNotFoundException {
+    public void update(final File file) throws EntityNotFoundException, WrongDataException {
         uow.getRepository(File.class).update(file);
         uow.saveChanges();
     }

@@ -3,6 +3,8 @@ package by.bsuir.MY.domain;
 import by.bsuir.MY.dal.model.interf.Entity;
 import by.bsuir.MY.domain.exception.WrongDataException;
 
+import java.util.Objects;
+
 /**
  * .
  */
@@ -135,14 +137,19 @@ public class File implements Entity {
 
         File file = (File) o;
 
-        if (getId() != file.getId()) return false;
-        if (getFirstName() != null ? !getFirstName().equals(file.getFirstName()) : file.getFirstName() != null)
-            return false;
-        if (getLastName() != null ? !getLastName().equals(file.getLastName()) : file.getLastName() != null)
-            return false;
-        if (getSurnameName() != null ? !getSurnameName().equals(file.getSurnameName()) : file.getSurnameName() != null)
-            return false;
-        return phrase != null ? phrase.equals(file.phrase) : file.phrase == null;
+        return Objects.equals(getId(), file.getId())
+                        && (getFirstName() != null
+                            ? getFirstName().equals(file.getFirstName())
+                            : file.getFirstName() == null)
+                        && (getLastName() != null
+                            ? getLastName().equals(file.getLastName())
+                            : file.getLastName() == null)
+                        && (getSurnameName() != null
+                            ? getSurnameName().equals(file.getSurnameName())
+                            : file.getSurnameName() == null)
+                        && (phrase != null
+                            ? phrase.equals(file.phrase)
+                            : file.phrase == null);
     }
 
     /**
@@ -239,7 +246,6 @@ public class File implements Entity {
         length = str.indexOf("</Phrase>");
         String phrases;
         phrases = str.substring(0, length);
-        str = str.substring(length).substring("</Phrase>".length());
 
         setId(ids);
         setFirstName(firstNames);

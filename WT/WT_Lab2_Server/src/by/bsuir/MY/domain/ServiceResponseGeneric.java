@@ -36,6 +36,7 @@ public class ServiceResponseGeneric<TContent>
      * @return .
      */
     @Override
+    @SuppressWarnings("all")
     public TContent getContent() {
         return (TContent) super.getContent();
     }

@@ -20,6 +20,9 @@ public class GetAllFilesCommand extends BaseCommand implements Command {
      * .
      */
     private FileService fileService;
+    /**
+     * .
+     */
     private App app;
 
     /**
@@ -41,7 +44,7 @@ public class GetAllFilesCommand extends BaseCommand implements Command {
      * @param request .
      */
     @Override
-    public ServiceResponse execute(String request) {
+    public ServiceResponse execute(final String request) {
         if (app.getUser() == null) {
             return ServiceResponse.createUnsuccessful(ServiceResponseCode.AccessDenied);
         }

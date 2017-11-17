@@ -64,7 +64,7 @@ public class DbSet<TEntity extends Entity> {
      * @param entity Entity to update.
      * @throws EntityNotFoundException when Entity doesn't exist.
      */
-    public void update(final TEntity entity) throws EntityNotFoundException {
+    public void update(final TEntity entity) throws EntityNotFoundException, WrongDataException {
         TEntity e = find(entity.getPrimaryKey());
 
         if (e == null) {
@@ -72,11 +72,7 @@ public class DbSet<TEntity extends Entity> {
                     "There are no entities with that primary key in database."
             );
         }
-        try {
-            e.fromString(entity.toString());
-        } catch (WrongDataException e1) {
-            e1.printStackTrace(); //TODO
-        }
+        e.fromString(entity.toString());
     }
 
     /**

@@ -10,8 +10,6 @@ import by.bsuir.MY.dal.repository.BaseRepository;
 import by.bsuir.MY.dal.repository.UserRepository;
 import by.bsuir.MY.dal.repository.interf.UsrRepository;
 
-import java.util.Collection;
-
 /**
  * Unit of Work with repositories with special functionality.
  */

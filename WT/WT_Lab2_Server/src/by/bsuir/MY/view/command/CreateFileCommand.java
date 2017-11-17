@@ -6,7 +6,6 @@ import by.bsuir.MY.dal.model.Role;
 import by.bsuir.MY.domain.File;
 import by.bsuir.MY.domain.Interf.ServiceResponseCode;
 import by.bsuir.MY.domain.ServiceResponse;
-import by.bsuir.MY.domain.ServiceResponseGeneric;
 import by.bsuir.MY.view.App;
 
 import java.util.regex.Pattern;
@@ -19,6 +18,9 @@ public class CreateFileCommand extends BaseCommand implements Command {
      * .
      */
     private FileService fileService;
+    /**
+     * .
+     */
     private App app;
 
     /**

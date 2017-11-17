@@ -2,11 +2,8 @@ package by.bsuir.MY;
 
 import by.bsuir.MY.dal.dbcontext.DBContext;
 import by.bsuir.MY.dal.dbcontext.FilesDBContext;
-import by.bsuir.MY.domain.File;
-import by.bsuir.MY.domain.exception.WrongDataException;
 import by.bsuir.MY.view.App;
 
-import java.io.Console;
 import java.io.IOException;
 
 /**
