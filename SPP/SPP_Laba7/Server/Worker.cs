@@ -7,6 +7,7 @@ using System.IO;
 using System.Runtime.Serialization.Json;
 using Service_Contract;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using StackExchange.Redis;
 
 
@@ -18,13 +19,14 @@ namespace Server
         public readonly object Loker;
         public List<Query> Queryes { get; }
         public ConnectionMultiplexer Redis { get; set; }
+        private Timer _timer;
 
         public Worker(ConnectionMultiplexer redis, object loker)
         {
             Queryes = new List<Query>();
             Redis = redis;
             Loker = loker;
-            new Timer(DoWork, null, 0, 5000);
+            _timer = new Timer(DoWork, null, 5000, 5000);
         }
 
         private Type GetType(string name)
@@ -78,13 +80,25 @@ namespace Server
             lock (Loker)
             {
                 var db = Redis.GetDatabase();
+                var smth = false;
                 foreach(var query in Queryes)
                 {
                     for (var j = 0; j<query.Priority;j++)
                     {
                         string message = db.ListLeftPop(query.RedisKey);
-                        if (message != null) PerformWork(message, query.Priority);
+                        if(message == null)
+                        {
+                            continue;
+                        }
+
+                        PerformWork(message, query.Priority);
+                        smth = true;
                     }
+                }
+
+                if(!smth)
+                {
+                    Console.WriteLine($"Worker {Name} do nothing.");
                 }
             }
         }

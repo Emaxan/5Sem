@@ -16,7 +16,7 @@ namespace Client
             try
             {
                 Console.Title = "CLIENT";
-                var address = new Uri("http://localhost:64133/IContract");
+                var address = new Uri("http://localhost:13666/IContract");
                 var binding = new BasicHttpBinding();
 
                 var endpoint = new EndpointAddress(address);
@@ -31,7 +31,7 @@ namespace Client
 
                 for (var i = 0; i < arr.Length; i++)
                 {
-                    arr[i] = new QClass(i, RandomString(3), RandomString(3));
+                    arr[i] = new QClass(i+1, RandomString(3), RandomString(3));
                     var serializedObj = SerializeObj(arr[i], arr[i].GetType());
                     var msg = new QMessage
                     {
