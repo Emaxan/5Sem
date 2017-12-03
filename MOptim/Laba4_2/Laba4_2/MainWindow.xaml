@@ -1,0 +1,43 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Laba4_2"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" xmlns:xcdg="http://schemas.xceed.com/wpf/xaml/datagrid" xmlns:sparrowToolkit="http://sparrowtoolkit.codeplex.com/wpf" x:Class="Laba4_2.MainWindow"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="500" Width="1000" >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <DataGrid AutoGenerateColumns="False" x:Name="grid" HorizontalAlignment="Stretch" Margin="10" VerticalAlignment="Stretch">
+            <DataGrid.Columns>
+                <DataGridTextColumn Width="1*" Header="F(x)" Binding="{Binding Path=f}"/>
+                <DataGridTextColumn Width="1*" Header="x1" Binding="{Binding Path=x1}"/>
+                <DataGridTextColumn Width="1*" Header="x2" Binding="{Binding Path=x2}"/>
+                <DataGridTextColumn Width="1*" Header="x3" Binding="{Binding Path=x3}"/>
+                <DataGridTextColumn Width="1*" Header="x4" Binding="{Binding Path=x4}"/>
+                <DataGridTextColumn Width="1*" Header="x5" Binding="{Binding Path=x5}"/>
+                <DataGridTextColumn Width="1*" Header="k" Binding="{Binding Path=k}"/>
+                <DataGridTextColumn Width="1*" Header="eps" Binding="{Binding Path=eps}"/>
+                <DataGridTextColumn Width="1*" Header="size" Binding="{Binding Path=size}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <DataGrid Grid.Row="1" AutoGenerateColumns="False" x:Name="grid1" HorizontalAlignment="Stretch" Margin="10,10,10,10" VerticalAlignment="Stretch">
+            <DataGrid.Columns>
+                <DataGridTextColumn Width="1*" Header="F(x)" Binding="{Binding Path=f}"/>
+                <DataGridTextColumn Width="1*" Header="x1" Binding="{Binding Path=x1}"/>
+                <DataGridTextColumn Width="1*" Header="x2" Binding="{Binding Path=x2}"/>
+                <DataGridTextColumn Width="1*" Header="x3" Binding="{Binding Path=x3}"/>
+                <DataGridTextColumn Width="1*" Header="x4" Binding="{Binding Path=x4}"/>
+                <DataGridTextColumn Width="1*" Header="x5" Binding="{Binding Path=x5}"/>
+                <DataGridTextColumn Width="1*" Header="k" Binding="{Binding Path=k}"/>
+                <DataGridTextColumn Width="1*" Header="eps" Binding="{Binding Path=eps}"/>
+                <DataGridTextColumn Width="1*" Header="size" Binding="{Binding Path=size}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button Content="Run" HorizontalAlignment="Stretch" Margin="10,10,10,10" VerticalAlignment="Center" Click="Button_Click" Grid.RowSpan="2"/>
+    </Grid>
+</Window>
