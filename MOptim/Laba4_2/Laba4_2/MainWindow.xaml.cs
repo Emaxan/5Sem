@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 
 namespace Laba4_2
 {
@@ -172,7 +171,6 @@ namespace Laba4_2
             {
                 ReturnPoint(_delta);
             }
-
         }
 
         private void ReturnPoint(Point p)
@@ -220,54 +218,6 @@ namespace Laba4_2
                         break;
                 }
             }
-            //List<SortObject> list = new List<SortObject>
-            //                        {
-            //                            new SortObject
-            //                            {
-            //                                Cost = (4/p.X1),
-            //                                Count = p.X1,
-            //                                Size = 4,
-            //                            },
-            //                            new SortObject
-            //                            {
-            //                                Cost = (3/p.X2),
-            //                                Count = p.X2,
-            //                                Size = 3,
-            //                            },
-            //                            new SortObject
-            //                            {
-            //                                Cost = (5/p.X3),
-            //                                Count = p.X3,
-            //                                Size = 5,
-            //                            },
-            //                            new SortObject
-            //                            {
-            //                                Cost = (40/p.X4),
-            //                                Count = p.X4,
-            //                                Size = 40,
-            //                            },
-            //                            new SortObject
-            //                            {
-            //                                Cost = (20/p.X5),
-            //                                Count = p.X5,
-            //                                Size = 20,
-            //                            }
-            //                        };
-            //list.Sort(Comparison);
-            //while(!CheckConstraints(_curPoint + Point.StaticFromList(list)))
-            //{
-            //    int sign;
-            //    if(list[0].Count <= 0)
-            //        sign = 1;
-            //    else
-            //        sign = -1;
-            //    if (list[0].Cost < 0.001)
-            //        break;
-            //    list[0].Count += sign*0.1;
-            //    list[0].Cost = list[0].Size/list[0].Cost;
-            //    list.Sort(Comparison);
-            //}
-            //p.FromList(list);
         }
 
         private int Comparison(SortObject o1, SortObject o2)
