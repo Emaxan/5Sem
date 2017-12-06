@@ -1,0 +1,21 @@
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    background-color: #cccccc;
+}
+
+.clearfix::after {
+    display: block;
+    content: "";
+    clear: both;
+}
+
+.container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+}

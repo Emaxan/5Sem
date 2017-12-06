@@ -1,0 +1,12 @@
+.panel {
+    margin: auto;
+    width: 50%;
+}
+
+.title {
+    text-align: center;
+}
+
+.authForm {
+    padding: 30px;
+}
