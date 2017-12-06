@@ -16,7 +16,7 @@ namespace Client
             try
             {
                 Console.Title = "CLIENT";
-                var address = new Uri("http://localhost:13666/IContract");
+                var address = new Uri("http://localhost:64133/IContract");
                 var binding = new BasicHttpBinding();
 
                 var endpoint = new EndpointAddress(address);
@@ -25,7 +25,7 @@ namespace Client
 
                 var channel = factory.CreateChannel();
 
-                QClass[] arr = new QClass[10];
+                QClass[] arr = new QClass[50];
                 List<string> strs = new List<string>();
                 var rnd = new Random();
 
